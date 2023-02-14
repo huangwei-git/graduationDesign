@@ -8,3 +8,7 @@ a{
     color:white;
     text-decoration: none;
 }
+
+.sl-no,.el-submenu{
+    user-select: none;
+}

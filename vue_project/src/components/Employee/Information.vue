@@ -1,8 +1,9 @@
 <template>
-  <el-main>
+  <div id="root">
     <!-- 搜索栏 -->
   <div style="margin-bottom: 20px">
       <el-date-picker
+          class="sl-no"
           @change="getDateRange"
           :editable="false"
           v-model="date"
@@ -11,9 +12,9 @@
           end-placeholder="结束日期"
           :default-time="['00:00:00', '23:59:59']">
       </el-date-picker>
-      <el-input placeholder="请输入内容" :suffix-icon="inputIconClass" v-model="input" class="input-with-select">
-        <el-select @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
-          <el-option label="姓名" :value="1"></el-option>
+      <el-input placeholder="请输入内容" :suffix-icon="inputIconClass" v-model="input" class="sl-no input-with-select">
+        <el-select class="sl-no"  @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
+          <el-option class="sl-no" label="姓名" :value="1"></el-option>
           <el-option label="工号" :value="2"></el-option>
           <el-option label="仓库" :value="3"></el-option>
         </el-select>
@@ -45,6 +46,15 @@
       <el-table-column prop="date" sortable label="日期" width="140"></el-table-column>
       <el-table-column prop="name" sortable label="姓名" width="120"></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
+      <el-table-column prop="rate" label="评分">
+        <el-rate
+            v-model="rate"
+            disabled
+            show-score
+            text-color="#ff9900"
+            score-template="{rate}">
+        </el-rate>
+      </el-table-column>
       <el-table-column prop="operate" width="120px" align="right">
         <template slot="header" slot-scope="scope">操作</template>
         <template slot-scope="scope">
@@ -68,7 +78,7 @@
           :hide-on-single-page="true">
       </el-pagination>
     </div>
-  </el-main>
+  </div>
 </template>
 
 <script>
@@ -82,37 +92,44 @@ export default {
       address: '广东省深圳市南山区粤海街道'
     };
     return {
+      rate:3,
       tableData:[
         {
           id:"2019024044",
           date: '2022-01-14',
           name: '宋濂',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },{
           id:"2019024048",
           date: '2021-03-15',
           name: '黄玮',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },{
           id:"2019024046",
           date: '2001-01-17',
           name: '柳帝',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },{
           id:"2019024047",
           date: '2019-08-13',
           name: '马克思',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },{
           id:"2019024048",
           date: '2018-06-01',
           name: '牛肉丸',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },{
           id:"2019024049",
           date: '2017-12-12',
           name: '牛蛙',
-          address: '广东省深圳市南山区粤海街道'
+          address: '广东省深圳市南山区粤海街道',
+          rate:3,
         },
       ],
       sideNavState:'收起',
@@ -195,7 +212,7 @@ export default {
             title:"删除成功！",
             message:row.id + " " + row.name,
           })
-          console.log("共"+this.currentSelected.length+"个")
+          console.log(row.id + " " + row.name)
         }).catch(() => {
           this.$notify.info({
             type: 'info',
