@@ -14,10 +14,16 @@ class Solution{
     private int costTab[][];
     // 方案表
     private int planTab[][];
+    // 基变量
+    private int target[][];
     // 行位势
     private int rowGeopotential[];
     // 列位势
     private int colGeopotential[];
+    // 模式
+    private boolean useVogel = false;
+    // 是否产销不平衡
+    private boolean unBalance = false;
 
 
 
@@ -28,28 +34,67 @@ class Solution{
         demander = b;
         this.numOfDemander = b.length;
         costTab = cost;
-        planTab = new int[numOfSupplier][numOfDemander];
-        rowGeopotential = new int[numOfSupplier];
-        colGeopotential = new int[numOfDemander];
+    }
+    public Solution(int[] a, int[] b, int[][] cost,boolean useVogel) {
+        supplier = a;
+        this.numOfSupplier = a.length;
+        demander = b;
+        this.numOfDemander = b.length;
+        costTab = cost;
+        this.useVogel = useVogel;
     }
 
     public void Run(){
+        // 0. 产销平衡处理
+        SupplyAndDemandBalance();
         // 1. 获得初始方案
-        getInitialPlan();
+        if(useVogel) getInitialPlanByVogel();
+        else getInitialPlanByMinElement();
         // 2. 位势法 + 闭合回路调整
         Point point = null;
         while((point = getBaseVariable()) != null){
-            System.out.println("-----------------------");
             // 2.1 获得入基变量
             // 2.2 通过入基变量求闭合回路
             LinkedList<Point> path = getclosedLoop(point.x, point.y);
             adjustClosedLoop(path,point);
+            System.out.println("-----------------------");
         }
 
         /*==========输出最终方案/*==========*/
         System.out.println("==========最终方案为==========");
         printArray(planTab);
         System.out.println("需要的价格为：" + getTotal());
+    }
+
+    // 0. 产销平衡化
+    private void SupplyAndDemandBalance(){
+        int supply = 0,demand = 0;
+        for(int i = 0;i < numOfSupplier;i++) supply += supplier[i];
+        for(int i = 0;i < numOfDemander;i++) demand += demander[i];
+        int diff = supply - demand;
+        if(diff > 0){
+            unBalance = true;
+            int tmpDemaner[] = new int[numOfDemander + 1];
+            for(int i = 0;i < numOfDemander;i++) tmpDemaner[i] = demander[i];
+            tmpDemaner[numOfDemander] = diff;
+            numOfDemander++;
+            demander = tmpDemaner;
+
+            int tmpCostTab[][] = new int[numOfSupplier][numOfDemander];
+            for (int i = 0; i < numOfSupplier; i++) {
+                int j;
+                for (j = 0; j < numOfDemander - 1; j++) {
+                    tmpCostTab[i][j] = costTab[i][j];
+                }
+                tmpCostTab[i][j] = 0;
+            }
+            costTab = tmpCostTab;
+        }
+
+        planTab = new int[numOfSupplier][numOfDemander];
+        target = new int[numOfSupplier][numOfDemander];
+        rowGeopotential = new int[numOfSupplier];
+        colGeopotential = new int[numOfDemander];
     }
 
     // 1. 贪心法：计算所有行和列中，最小值和次小值的差值，从中取出最大的一个，作为入基变量
@@ -117,7 +162,8 @@ class Solution{
     }
 
     // 2. 获得初始解决方案
-    private void getInitialPlan(){
+    //      2.1 方法一： Vogel伏格尔法
+    private void getInitialPlanByVogel(){
         int temp_A[] = supplier.clone();
         int temp_B[] = demander.clone();
         int invalidRows[] = new int[numOfSupplier];
@@ -127,28 +173,121 @@ class Solution{
         // 记录没被划掉的列
         int cnt_col = numOfDemander;
         Point point = null;
+        if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = Integer.MAX_VALUE - 1;
         while(cnt_row != 0 && cnt_col != 0){
             if(cnt_row == 1 && cnt_col == 1){
                 for(int i = 0; i < numOfSupplier; i++) if(invalidRows[i] == 0) point.x = i;
                 for(int j = 0; j < numOfDemander; j++) if(invalidColumns[j] == 0) point.y = j;
             }else point = getGap(invalidRows,invalidColumns);
 
+            int cnt = 0;
             int min = temp_A[point.x] < temp_B[point.y]?temp_A[point.x]:temp_B[point.y];
             planTab[point.x][point.y] = min;
-            if((temp_A[point.x] -= min) == 0) {invalidRows[point.x] = 1;cnt_row--;};
-            if((temp_B[point.y] -= min) == 0) {invalidColumns[point.y] = 1;cnt_col--;};
+            target[point.x][point.y] = 1;
+            if((temp_A[point.x] -= min) == 0) {invalidRows[point.x] = 1;cnt_row--;cnt++;};
+            if((temp_B[point.y] -= min) == 0) {invalidColumns[point.y] = 1;cnt_col--;cnt++;};
+            // 退化
+            if(cnt == 2){
+                Point tmpPoint = new Point(-1, -1);
+                int tmp = Integer.MAX_VALUE;
+                for(int i = 0;i < numOfDemander;i++){
+                    if(invalidColumns[i] == 1 || i == point.y) continue;
+                    if(costTab[point.x][i] <= tmp){
+                        tmp = costTab[point.x][i];
+                        tmpPoint.x = point.x;
+                        tmpPoint.y = i;
+                    }
+                }
+                for(int i = 0;i < numOfSupplier;i++){
+                    if(invalidRows[i] == 1 || i == point.x) continue;
+                    if(costTab[i][point.y] <= tmp){
+                        tmp = costTab[i][point.y];
+                        tmpPoint.x = i;
+                        tmpPoint.y = point.y;
+                    }
+                }
+                if(tmpPoint.x != -1){
+                    planTab[tmpPoint.x][tmpPoint.y] = 0;
+                    target[tmpPoint.x][tmpPoint.y] = 1;
+                }
+            }
         }
+        if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = 0;
+        System.out.println("==========初始解决方案==========");
+        printArray(planTab);
+    }
+    //      2.2 方法二： 最小元素法
+    private void getInitialPlanByMinElement(){
+        int temp_A[] = supplier.clone();
+        int temp_B[] = demander.clone();
+        int invalidRows[] = new int[numOfSupplier];
+        int invalidColumns[] = new int[numOfDemander];
+        // 记录没被划掉的行
+        int cnt_row = numOfSupplier;
+        // 记录没被划掉的列
+        int cnt_col = numOfDemander;
+        Point point = new Point(-1, -1);
+
+        if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = Integer.MAX_VALUE - 1;
+        while(cnt_row != 0 && cnt_col != 0){
+            if(cnt_row == 1 && cnt_col == 1){
+                for(int i = 0; i < numOfSupplier; i++) if(invalidRows[i] == 0) point.x = i;
+                for(int j = 0; j < numOfDemander; j++) if(invalidColumns[j] == 0) point.y = j;
+            }else {
+                int min = Integer.MAX_VALUE;
+                for (int i = 0; i < numOfSupplier; i++) {
+                    if(invalidRows[i] == 1) continue;
+                    for (int j = 0; j < numOfDemander; j++) {
+                        if (invalidColumns[j] == 1) continue;
+                        if(costTab[i][j] < min){
+                            min = costTab[i][j];
+                            point.x = i;
+                            point.y = j;
+                        }
+                    }
+                }
+            };
+
+            int cnt = 0;
+            int min = temp_A[point.x] < temp_B[point.y]?temp_A[point.x]:temp_B[point.y];
+            planTab[point.x][point.y] = min;
+            target[point.x][point.y] = 1;
+            if((temp_A[point.x] -= min) == 0) {invalidRows[point.x] = 1;cnt_row--;cnt++;};
+            if((temp_B[point.y] -= min) == 0) {invalidColumns[point.y] = 1;cnt_col--;cnt++;};
+
+            // 退化
+            if(cnt == 2){
+                Point tmpPoint = new Point(-1, -1);
+                int tmp = Integer.MAX_VALUE;
+                for(int i = 0;i < numOfDemander;i++){
+                    if(invalidColumns[i] == 1 || i == point.y) continue;
+                    if(costTab[point.x][i] <= tmp){
+                        tmp = costTab[point.x][i];
+                        tmpPoint.x = point.x;
+                        tmpPoint.y = i;
+                    }
+                }
+                for(int i = 0;i < numOfSupplier;i++){
+                    if(invalidRows[i] == 1 || i == point.x) continue;
+                    if(costTab[i][point.y] <= tmp){
+                        tmp = costTab[i][point.y];
+                        tmpPoint.x = i;
+                        tmpPoint.y = point.y;
+                    }
+                }
+                if(tmpPoint.x != -1){
+                    planTab[tmpPoint.x][tmpPoint.y] = 0;
+                    target[tmpPoint.x][tmpPoint.y] = 1;
+                }
+            }
+        }
+        if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = 0;
 
         System.out.println("==========初始解决方案==========");
-        for(int i = 0; i < numOfSupplier; i++){
-            for (int j = 0; j < numOfDemander; j++){
-                System.out.print(planTab[i][j]+"\t");
-            }
-            System.out.println();
-        }
+        printArray(planTab);
     }
 
-    // 2. 计算位势
+    // 3. 计算位势
     private void getGeopotential() {
         /**
          * 计算位势
@@ -173,7 +312,7 @@ class Solution{
                 if(flag == 0){
                     for(int i = 0; i < numOfDemander; i++){
                         // 如果已经计算过位势 或 对应位置的元素为非基变量 ，则跳过
-                        if(visitedCol[i] == 1 || planTab[op][i] == 0) continue;
+                        if(visitedCol[i] == 1 || target[op][i] == 0) continue;
                         // 列位势 = 运费 - 行位势
                         colGeopotential[i] = costTab[op][i] - rowGeopotential[op];
                         visitedCol[i] = 1;
@@ -184,7 +323,7 @@ class Solution{
                 else{
                     for(int i = 0; i < numOfSupplier; i++){
                         // 如果已经计算过位势 或 对应位置的元素为非基变量 ，则跳过
-                        if(visitedRow[i] == 1 || planTab[i][op] == 0) continue;
+                        if(visitedRow[i] == 1 || target[i][op] == 0) continue;
                         // 行位势 = 运费 - 列位势
                         rowGeopotential[i] = costTab[i][op] - colGeopotential[op];
                         visitedRow[i] = 1;
@@ -219,7 +358,7 @@ class Solution{
             for (int j = 0; j < numOfDemander; j++) {
                 int thet = costTab[i][j] - (rowGeopotential[i] + colGeopotential[j]);
                 check[i][j] = thet;
-                if(thet < minThet){
+                if(thet < minThet && costTab[i][j] != 0){
                     minThet = thet;
                     point.x = i;
                     point.y = j;
@@ -254,12 +393,12 @@ class Solution{
     // 5. 递归求闭合回路1
     private LinkedList getclosedLoop(int S, int T) {
         LinkedList path = null;
-        int visisted[][] = new int[planTab.length][planTab[0].length];
+        int visisted[][] = new int[target.length][target[0].length];
         // 在当前点的左右方向出发找闭合回路
-        path = findClosedLoop(planTab, 0, S, T, S, T, visisted, true);
+        path = findClosedLoop(0, S, T, S, T, visisted, true);
         // 如果左右方向出发找不到，则上下方向出发寻找闭合回路
         if(path == null)
-            path = findClosedLoop(planTab, 1, S, T, S, T, visisted,true);
+            path = findClosedLoop(1, S, T, S, T, visisted,true);
 
         /*==========输出闭合回路路径/*==========*/
         System.out.println("所得闭合回路为：");
@@ -273,7 +412,7 @@ class Solution{
     /**
      * 递归寻找点（x,y）出发，能到达（S，T）的路径
      *  其中，isFirst变量用于排除自回路
-     * @param arr
+     * @param target
      * @param direction：方向，为0则当前在左右方向找，为1则在上下方向找
      * @param x：当前所在点x轴坐标
      * @param y：当前所在点y轴坐标
@@ -283,15 +422,15 @@ class Solution{
      * @param isFirst：标记是不是目标点第一次调用该递归函数
      * @return
      */
-    private LinkedList<Point> findClosedLoop(int arr[][], int direction, int x, int y,int S,int T, int visited[][],boolean isFirst) {
+    private LinkedList<Point> findClosedLoop(int direction, int x, int y,int S,int T, int visited[][],boolean isFirst) {
         if(x == S  && y == T && !isFirst) return new LinkedList<>();
         if (direction == 0) {
             // 左右寻找
-            for (int j = 0; j < arr[0].length; j++) {
+            for (int j = 0; j < target[0].length; j++) {
                 // 如果该点未访问过 or 该点为目标点且非第一次调用，则递归寻找
-                if((arr[x][j] != 0 && visited[x][j] == 0) || (x == S && j == T && !isFirst)){
+                if((target[x][j] != 0 && visited[x][j] == 0) || (x == S && j == T && !isFirst)){
                     visited[x][j] = 1;
-                    LinkedList ret = findClosedLoop(arr, 1, x, j, S, T, visited, false);
+                    LinkedList ret = findClosedLoop(1, x, j, S, T, visited, false);
                     // 若找到目标点，则该点加入路径并返回；否则撤销该点作为路径
                     if (ret != null) {
                         ret.add(new Point(x, y));
@@ -302,10 +441,10 @@ class Solution{
             }
         } else {
             // 上下寻找
-            for (int i = 0; i < arr.length; i++) {
-                if(arr[i][y] != 0 && visited[i][y] == 0 || (i == S && y == T  && !isFirst)){
+            for (int i = 0; i < target.length; i++) {
+                if(target[i][y] != 0 && visited[i][y] == 0 || (i == S && y == T  && !isFirst)){
                     visited[i][y] = 1;
-                    LinkedList ret = findClosedLoop(arr, 0, i, y, S, T, visited,false);
+                    LinkedList ret = findClosedLoop(0, i, y, S, T, visited,false);
                     if (ret != null) {
                         ret.add(new Point(x, y));
                         return ret;
@@ -325,11 +464,17 @@ class Solution{
         int index = path.indexOf(point);
         if(index % 2 == 0) index = 1;
         else index = 0;
+        Point tmpPoint = new Point(-1,-1);
         for(int i = index;i < path.size();i+=2){
             Point p = path.get(i);
             int val = planTab[p.x][p.y];
-            if(val < delta) delta = val;
+            if(val < delta){
+                tmpPoint = p;
+                delta = val;
+            }
         }
+        target[tmpPoint.x][tmpPoint.y] = 0;
+        target[point.x][point.y] = 1;
         // 计算原总价
         int oldTotal = getTotal();
         // 2. 修改回路上的分配方案
@@ -375,7 +520,10 @@ class Solution{
     private void printArray(int arr[][]){
         for(int i = 0; i < numOfSupplier; i++){
             for(int j = 0; j < numOfDemander; j++){
-                System.out.print(arr[i][j] + " ");
+                if(target[i][j] == 1)
+                    System.out.print("" + arr[i][j] + "_\t");
+                else
+                    System.out.print("" + arr[i][j] + "\t");
             }
             System.out.println();
         }

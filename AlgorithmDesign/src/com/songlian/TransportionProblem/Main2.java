@@ -1,6 +1,6 @@
 package com.songlian.TransportionProblem;
 
-public class Main {
+public class Main2 {
     public static void main(String[] args) {
         int cost[][] = {
                 {3,2,4,5},
@@ -10,7 +10,7 @@ public class Main {
         int supplier[] = {30,40,50};
         int demander[] = {16,30,24,50};
 
-        Solution solution = new Solution(supplier, demander, cost,true);
+        Solution solution = new Solution(supplier, demander, cost);
         solution.Run();
     }
 }
