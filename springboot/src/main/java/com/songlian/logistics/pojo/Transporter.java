@@ -1,9 +1,7 @@
 package com.songlian.logistics.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
@@ -37,12 +35,12 @@ public class Transporter implements Serializable {
     @TableField("date_of_entry")
     private LocalDateTime dateOfEntry;
 
-    @TableField("delivery_id")
-    private Integer deliveryId;
+    @TableField("loc_Send_id")
+    private Integer locSendId;
 
     private String state;
 
-    @Version
+    @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;
 
 

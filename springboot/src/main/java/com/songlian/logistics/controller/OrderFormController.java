@@ -1,11 +1,14 @@
 package com.songlian.logistics.controller;
 
 
+import com.songlian.logistics.pojo.OrderDetail;
 import com.songlian.logistics.pojo.OrderForm;
 import com.songlian.logistics.service.OrderFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +43,10 @@ public class OrderFormController {
     // 新增
     @PostMapping
     public boolean save(@RequestBody OrderForm orderForm){
+        System.out.println(orderForm);
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setOrderId(orderForm.getOrderId());
+        orderDetail.set
         return orderFormService.save(orderForm);
     }
 

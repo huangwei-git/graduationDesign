@@ -1,7 +1,7 @@
 package com.songlian.logistics.dao;
 
-import com.songlian.logistics.pojo.Delivery;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.songlian.logistics.pojo.Location;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author 黄玮
  * @since 2023-02-17
  */
-public interface DeliveryDao extends BaseMapper<Delivery> {
+public interface LocationDao extends BaseMapper<Location> {
 
 }

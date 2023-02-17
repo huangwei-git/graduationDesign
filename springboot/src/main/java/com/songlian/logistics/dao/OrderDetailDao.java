@@ -1,7 +1,7 @@
 package com.songlian.logistics.dao;
 
-import com.songlian.logistics.pojo.OrderDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.songlian.logistics.pojo.OrderDetail;
 
 /**
  * <p>

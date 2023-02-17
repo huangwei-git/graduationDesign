@@ -1,7 +1,8 @@
 package com.songlian.logistics.service;
 
-import com.songlian.logistics.pojo.Demand;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.songlian.logistics.pojo.Inventory;
+import com.songlian.logistics.pojo.Location;
 
 /**
  * <p>
@@ -11,6 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 黄玮
  * @since 2023-02-17
  */
-public interface DemandService extends IService<Demand> {
-
+public interface LocationService extends IService<Location> {
 }

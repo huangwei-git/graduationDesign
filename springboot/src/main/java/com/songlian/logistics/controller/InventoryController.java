@@ -37,11 +37,13 @@ public class InventoryController {
     // 根据id查询
     @GetMapping("/{id}")
     public Inventory selectById(@PathVariable Integer id){
-        return inventoryService.getById(id);}
+            return inventoryService.getById(id);
+    }
 
     // 新增
     @PostMapping
     public boolean save(@RequestBody Inventory inventory){
+        System.out.println(inventory);
         return inventoryService.save(inventory);
     }
 

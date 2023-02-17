@@ -1,7 +1,5 @@
 package com.songlian.logistics;
 
-import com.songlian.logistics.dao.DeliveryDao;
-import com.songlian.logistics.pojo.Delivery;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;

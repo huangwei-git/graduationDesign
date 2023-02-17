@@ -1,7 +1,7 @@
 package com.songlian.logistics.service;
 
-import com.songlian.logistics.pojo.OrderDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.songlian.logistics.pojo.OrderDetail;
 
 /**
  * <p>

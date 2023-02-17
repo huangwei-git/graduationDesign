@@ -1,9 +1,7 @@
 package com.songlian.logistics.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
@@ -39,7 +37,7 @@ public class Manager implements Serializable {
 
     private String password;
 
-    @Version
+    @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;
 
 

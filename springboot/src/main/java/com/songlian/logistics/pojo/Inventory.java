@@ -1,14 +1,10 @@
 package com.songlian.logistics.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -24,15 +20,18 @@ public class Inventory implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @MppMultiId
-    @TableField("delivery_id")
-    private Integer deliveryId;
+    @TableId(value = "store_id",type = IdType.AUTO)
+    private Integer storeId;
 
-    @MppMultiId
+    @TableField("loc_send_id")
+    private Integer locSendId;
+
     @TableField("material_id")
     private Integer materialId;
 
     private Integer amount;
 
+    @TableLogic(value = "0" ,delval = "1")
+    private Integer deleted;
 
 }

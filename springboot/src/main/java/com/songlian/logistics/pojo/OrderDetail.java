@@ -1,12 +1,10 @@
 package com.songlian.logistics.pojo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-
-import java.io.Serializable;
-
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -22,19 +20,20 @@ public class OrderDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @MppMultiId
+    @TableId(value = "detail_id",type = IdType.AUTO)
+    private Integer detailId;
+
     @TableField("order_id")
     private Long orderId;
 
-    @MppMultiId
     @TableField("transporter_id")
     private Integer transporterId;
 
-    @MppMultiId
-    @TableField("delivery_id")
-    private Integer deliveryId;
+    @TableField("loc_receive_id")
+    private Integer locReceiveId;
 
     private Integer amount;
 
-
+    @TableLogic(value = "0" ,delval = "1")
+    private Integer deleted;
 }
