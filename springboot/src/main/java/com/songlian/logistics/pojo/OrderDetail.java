@@ -26,8 +26,8 @@ public class OrderDetail implements Serializable {
     @TableField("order_id")
     private Long orderId;
 
-    @TableField("transporter_id")
-    private Integer transporterId;
+    @TableField("t_uid")
+    private Integer uid;
 
     @TableField("loc_receive_id")
     private Integer locReceiveId;

@@ -39,7 +39,7 @@ public class Generator {
         // 策略配置
         StrategyConfig strategyConfig = new StrategyConfig();
         strategyConfig.setInclude("delivery","location",// 设置当前参与生成的表名，参数为可变参数
-                "inventory","manager","material","order_detail","order_form","transporter");
+                "inventory","manager","material","order_detail","order_form","user");
         strategyConfig.setRestControllerStyle(true);    // 设置是否启用Restful
         strategyConfig.setVersionFieldName("deleted");  // 设置逻辑删除字段名
         strategyConfig.setEntityLombokModel(true);      // 设置是否启用lombok

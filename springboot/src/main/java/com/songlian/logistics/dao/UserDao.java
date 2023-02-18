@@ -1,6 +1,6 @@
 package com.songlian.logistics.dao;
 
-import com.songlian.logistics.pojo.Transporter;
+import com.songlian.logistics.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author 黄玮
  * @since 2023-02-17
  */
-public interface TransporterDao extends BaseMapper<Transporter> {
+public interface UserDao extends BaseMapper<User> {
 
 }

@@ -25,8 +25,8 @@ public class OrderForm implements Serializable {
     @TableId(value = "order_id", type = IdType.ASSIGN_ID)
     private Long orderId;
 
-    @TableField("manager_id")
-    private Integer managerId;
+    @TableField("m_uid")
+    private Integer uid;
 
     @TableField("loc_send_id")
     private Integer locSendId;

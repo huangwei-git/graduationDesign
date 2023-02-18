@@ -1,7 +1,7 @@
 package com.songlian.logistics.dao;
 
-import com.songlian.logistics.pojo.Manager;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.songlian.logistics.pojo.Account;
 
 /**
  * <p>
@@ -9,8 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author 黄玮
- * @since 2023-02-17
+ * @since 2023-02-18
  */
-public interface ManagerDao extends BaseMapper<Manager> {
-
+public interface AccountDao extends BaseMapper<Account> {
 }

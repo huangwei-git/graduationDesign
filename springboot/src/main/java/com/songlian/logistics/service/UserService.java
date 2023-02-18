@@ -1,6 +1,6 @@
 package com.songlian.logistics.service;
 
-import com.songlian.logistics.pojo.Transporter;
+import com.songlian.logistics.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 黄玮
  * @since 2023-02-17
  */
-public interface TransporterService extends IService<Transporter> {
+public interface UserService extends IService<User> {
 
 }
