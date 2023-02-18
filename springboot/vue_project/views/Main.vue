@@ -30,31 +30,81 @@
 
     <el-table
         ref="mutiTable"
-        :data="tableData2"
+        :data="tableData"
         stripe
+        border
         @selection-change="handleSelectionChange"
         :default-sort = "{prop: 'id', order: 'inscending'}"
         :cell-style="{ textAlign: 'center' }"
-        :header-cell-style="{ textAlign: 'center' }"
+        :header-cell-style="{ textAlign: 'center',background:'#f3f6fd',color:'#555' }"
         @row-click="storeClickedRowInfo"
+        style="margin-top: 10px;"
     >
       <el-table-column align="center" type="selection" width="45"></el-table-column>
       <el-table-column type="index" width="100">
         <template slot="header" slot-scope="scope">序号</template>
       </el-table-column>
-      <el-table-column prop="name" sortable label="姓名" width="220"></el-table-column>
-      <el-table-column prop="sex" sortable label=性别" width="140"></el-table-column>
-      <el-table-column prop="locSendId" sortable label="所在配送中心编号" width="220"></el-table-column>
-      <el-table-column prop="phone" sortable label="手机号" width="280"></el-table-column>
-      <el-table-column prop="dateOfEntry" sortable label="入职时间" width="280"></el-table-column>
-      <el-table-column prop="state" label="状态"></el-table-column>
+      <el-table-column prop="uid" sortable label="工号" width="150%">
+        <template slot-scope="scope">
+          <el-tag>{{scope.row.uid}}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" sortable label="姓名" width="150%"></el-table-column>
+      <el-table-column prop="sex" sortable label=性别" width="120%"></el-table-column>
+      <el-table-column prop="locSendId" sortable label="所在配送中心编号" width="180%"
+                       :filter-method="filterLocation"
+                       :filters="locations"
+                       filter-placement="bottom">
+        <template slot-scope="scope">
+          <i class="el-icon-location-outline"></i>
+          <span> {{scope.row.locSendId}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" sortable label="手机号" width="200%">
+        <template slot-scope="scope">
+          <i class="el-icon-phone-outline"></i>
+          <span> {{scope.row.phone}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="dateOfEntry" sortable label="入职时间" width="230%">
+        <template slot-scope="scope">
+          <i class="el-icon-time"></i>
+          <span> {{scope.row.dateOfEntry}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+          prop="state"
+          label="状态"
+          :filters="[{ text: 'leisure', value: 'leisure' },
+                     { text: 'work', value: 'work' },
+                     { text: 'rest', value: 'rest' }]"
+          :filter-method="filterState"
+          filter-placement="bottom">
+        <template slot-scope="scope">
+          <el-tag
+              :type="scope.row.state === 'leisure' ? 'success' :
+                     scope.row.state === 'work'? 'danger' : 'info'"
+              disable-transitions
+              effect="plain"
+              style="width: 60px;font-weight: bold;"
+          >
+            {{scope.row.state}}
+          </el-tag>
+        </template>
+      </el-table-column>
 
-      <el-table-column prop="operate" width="120px" align="right">
+      <el-table-column prop="deleted" label="评分">
+        <template slot-scope="scope">
+          <el-rate v-model="scope.row.deleted"></el-rate>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="operate" width="250%" align="right">
         <template slot="header" slot-scope="scope">操作</template>
         <template slot-scope="scope">
-          <el-button @click="handleClickLook(scope.row)" type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small">删除</el-button>
+          <el-button @click="handleClickLook(scope.row)" type="success" size="small">查看</el-button>
+          <el-button type="primary" size="small">编辑</el-button>
+          <el-button type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -83,42 +133,11 @@ export default {
   name: "Main",
   data(){
     return {
+      locations:[],
       rate:3,
-      tableData2:[],
-      tableData:[
-        {
-          name: '宋濂',
-          sex: '男',
-          locSendId: '2',
-          phone:'17606022336',
-          dateOfEntry:'1999-02-08',
-          state: 'work',
-        },{
-          name: '黄玮',
-          sex:"男",
-          locSendId: '1',
-          phone:'17606603210',
-          dateOfEntry:'2001-01-17',
-          state: 'leisure',
-        },{
-          name: '柳帝',
-          sex:"女",
-          locSendId: '1',
-          phone:'13823764112',
-          dateOfEntry:'2001-01-06',
-          state: 'leisure',
-        },{
-          name:"牛蛙",
-          sex: '男',
-          phone:'13509655113',
-          dateOfEntry:'2000-10-25',
-          locSendId: '2',
-          state: 'rest',
-        },
-      ],
+      tableData:[],
       sideNavState:'收起',
       sideWidth:220,
-
       input:'',
       select:1,
       date:'',
@@ -134,12 +153,41 @@ export default {
   },
   methods:{
     loadGet(){
-      this.$axios.get(this.$httpUrl + '/transporter')
+      this.$axios.get(this.$httpUrl + '/user')
           .then(res=>res.data)
           .then(res=>{
-            this.tableData2 = res;
-            console.log(res);
+            this.tableData = res.data;
+
+            let set = new Set();
+            let setFilter = new Set();
+            this.tableData.forEach(item => {
+              // 格式化处理时间
+              let len = item.dateOfEntry.indexOf('T');
+              item.dateOfEntry = item.dateOfEntry.slice(0,len);
+
+
+              item.deleted = item.locSendId + 2;
+              console.log()
+
+              // 获取“运输中心”字段的过滤器数值
+              set.add(item.locSendId);
+            })
+            set.forEach(item => {
+              setFilter.add({text:item,value:item});
+            })
+            this.locations = [...setFilter];
       })
+    },
+    filterLocation(value, row){
+      return row.locSendId === value;
+    },
+    filterState(value, row) {
+      return row.state === value;
+    },
+    filterHandler(value, row, column) {
+      const property = column['state'];
+      console.log(property,value);
+      return row[property] === value;
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
@@ -147,6 +195,7 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
+    // 控制搜索栏中，标签样式
     getChangeValue(){
       if(this.select === 2){
         this.inputIconClass = 'el-icon-search';
@@ -156,20 +205,25 @@ export default {
         this.inputIconClass = 'el-icon-user';
       }
     },
+    // 获得选择的时间范围
     getDateRange(){
       console.log(this.date);
     },
+    // “查看”操作
     handleClickLook(row) {
-      console.log(row.id);
-      console.log(row.date);
       console.log(row.name);
-      console.log(row.address);
+      console.log(row.locSendId);
+      console.log(row.dateOfEntry);
+      console.log(row.phone);
+      console.log(row.email);
+      console.log(row.state);
     },
     handleSelectionChange(val) {
       if(val.length) this.handleDisable = false;
       else this.handleDisable = true;
       this.currentSelected = val;
     },
+    // “批量删除”操作
     handlerDeleteAllSelected(){
       this.$confirm('此操作将永久删除所选记录, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -192,6 +246,7 @@ export default {
         });
       });
     },
+    // “删除”操作
     storeClickedRowInfo(row,column,event){
       if(column.property === "operate"
           && event.target.innerText.includes("删除")){
@@ -204,7 +259,7 @@ export default {
             title:"删除成功！",
             message:row.id + " " + row.name,
           })
-          console.log(row.id + " " + row.name)
+          console.log(row.name)
         }).catch(() => {
           this.$notify.info({
             type: 'info',
@@ -235,4 +290,5 @@ export default {
   margin-left: 5px;
   background-color: #fff;
 }
+
 </style>

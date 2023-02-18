@@ -40,7 +40,6 @@ export default {
   },mounted() {
     this.$bus.$on("sendSideWidth",data => {
       this.sideWidth = data;
-      console.log(this.sideWidth)
     })
   }
 }

@@ -54,7 +54,6 @@ export default {
         this.sideWidth = 220;
         this.sideNavState = '收起'
       }
-      console.log(111);
       this.$bus.$emit('sendCollapseBtnClass',this.collapseBtnClass);
       this.$bus.$emit('sendSideNavState',this.sideNavState);
       this.$bus.$emit('sendSideWidth',this.sideWidth);
