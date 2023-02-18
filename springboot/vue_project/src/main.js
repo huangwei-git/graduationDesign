@@ -7,6 +7,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/globale.css'
 import axios from "axios";
+//import request from "../utils/request.js";
 
 Vue.config.productionTip = false
 
@@ -17,6 +18,7 @@ Vue.use(VueRouter)
 Vue.use(Vuex)
 import store from '../store/store.js'
 
+//Vue.prototype.$axios = request;
 new Vue({
   render: h => h(App),
   store,
