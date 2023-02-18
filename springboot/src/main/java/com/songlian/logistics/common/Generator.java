@@ -1,4 +1,4 @@
-package com.songlian.logistics;
+package com.songlian.logistics.common;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;

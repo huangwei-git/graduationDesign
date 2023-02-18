@@ -44,9 +44,6 @@ public class OrderFormController {
     @PostMapping
     public boolean save(@RequestBody OrderForm orderForm){
         System.out.println(orderForm);
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setOrderId(orderForm.getOrderId());
-        orderDetail.set
         return orderFormService.save(orderForm);
     }
 

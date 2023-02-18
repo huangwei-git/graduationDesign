@@ -1,7 +1,9 @@
 package com.songlian.logistics.service;
 
-import com.songlian.logistics.pojo.Material;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.songlian.logistics.pojo.Material;
 
 /**
  * <p>
@@ -12,5 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2023-02-17
  */
 public interface MaterialService extends IService<Material> {
+    IPage genPage(IPage<Material> page);
 
 }

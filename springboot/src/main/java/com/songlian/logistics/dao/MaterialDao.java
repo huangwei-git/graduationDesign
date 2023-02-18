@@ -1,7 +1,10 @@
 package com.songlian.logistics.dao;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.songlian.logistics.pojo.Material;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MaterialDao extends BaseMapper<Material> {
 
+    IPage genPage(IPage<Material> page);
 }

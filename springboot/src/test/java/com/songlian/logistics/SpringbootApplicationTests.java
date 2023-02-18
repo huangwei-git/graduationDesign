@@ -1,5 +1,7 @@
 package com.songlian.logistics;
 
+import com.songlian.logistics.dao.TransporterDao;
+import com.songlian.logistics.pojo.Transporter;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SpringbootApplicationTests {
 
     @Autowired
-    DeliveryDao deliveryDao;
+    TransporterDao deliveryDao;
 
     @Test
     void contextLoads() {
