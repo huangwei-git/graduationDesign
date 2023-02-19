@@ -51,13 +51,13 @@ public class UserController {
 
 
     @PostMapping
-    public Result save(@RequestBody User list){
-        System.out.println(list);
+    public Result save(@RequestBody User user){
         try {
-            boolean res = userService.save(list);
-            if(res) return Result.success();
-            else return Result.fail();
+            System.out.println("user = " + user);
+            userService.save(user);
+            return Result.success();
         }catch (Exception e){
+            System.out.println("User添加失败！" + e.getStackTrace());
             return Result.fail();
         }
     }
@@ -65,65 +65,65 @@ public class UserController {
     // 修改
     @PutMapping
     public Result modify(@RequestBody User user){
-        boolean res =  userService.updateById(user);
-        if(res) return Result.success();
-        else return Result.fail();
+        try {
+            userService.updateById(user);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println("User更新失败！" + e.getStackTrace());
+            return Result.fail();
+        }
     }
 
     @PostMapping("/listPage")
     public Result listByPage(@RequestBody QueryPageParam query) {
-        try {
-            // 获取参数
-            long size = (long) query.getPageSize();
-            long num = (long) query.getPageNum();
-            String name = (String) query.getParams().get("name");
-            String suid = (String) query.getParams().get("uid");
-            Integer uid = null;
-            if(suid.length() > 0){
-                try {
-                    uid = Integer.parseInt(suid);
-                }catch (Exception e){ uid = -1;}
-            }else uid = null;
-            String phone = (String) query.getParams().get("phone");
-            String sex = (String) query.getParams().get("selectSex");
-            String startTime = (String) query.getParams().get("startTime");
-            String endTime = (String) query.getParams().get("endTime");
-            // 初始化分页信息
-            Page<User> page = new Page<>();
-            page.setSize(size);
-            page.setCurrent(num);
-
-            // 查询条件
-            LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper();
-            lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),User::getName,name);
-            lqw.eq(uid != null,User::getUid,uid);
-            lqw.like(!phone.equals("null") && StringUtils.isNoneBlank(phone), User::getPhone, phone);
-            lqw.like(!phone.equals("null") && StringUtils.isNoneBlank(phone), User::getPhone, phone);
-            lqw.eq(!sex.equals("null") && StringUtils.isNoneBlank(sex), User::getSex, sex);
-            //if(StringUtils.isNoneBlank(startTime)){
-            //    lqw.and(wrapper -> wrapper
-            //            .likeRight(StringUtils.isNoneBlank(startTime), User::getDateOfEntry, startTime)
-            //            .or()
-            //            .likeRight(StringUtils.isNoneBlank(endTime), User::getDateOfEntry, endTime));
-            //}
-            //else{
-            //    lqw.likeRight(StringUtils.isNoneBlank(endTime), User::getDateOfEntry, endTime);
-            //}
-
-            IPage iPage = userService.page(page, lqw);
-            return Result.success(iPage.getRecords(),iPage.getTotal());
-        }catch (Exception e){
-            System.out.println("UserController.listByPage:" + e);
-            return Result.fail(e.toString());
-        }
+        return userService.pageList(query);
+        //try {
+        //    // 获取参数
+        //    long size = (long) query.getPageSize();
+        //    long num = (long) query.getPageNum();
+        //    String name = (String) query.getParams().get("name");
+        //    String suid = (String) query.getParams().get("uid");
+        //    Integer uid = null;
+        //    if(suid.length() > 0){
+        //        try {
+        //            uid = Integer.parseInt(suid);
+        //        }catch (Exception e){ uid = -1;}
+        //    }else uid = null;
+        //    String phone = (String) query.getParams().get("phone");
+        //    String sex = (String) query.getParams().get("selectSex");
+        //    String startTime = (String) query.getParams().get("startTime");
+        //    String endTime = (String) query.getParams().get("endTime");
+        //    // 初始化分页信息
+        //    Page<User> page = new Page<>();
+        //    page.setSize(size);
+        //    page.setCurrent(num);
+        //
+        //    // 查询条件
+        //    LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper();
+        //    lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),User::getName,name);
+        //    lqw.eq(uid != null,User::getUid,uid);
+        //    lqw.like(!phone.equals("null") && StringUtils.isNoneBlank(phone), User::getPhone, phone);
+        //    lqw.like(!phone.equals("null") && StringUtils.isNoneBlank(phone), User::getPhone, phone);
+        //    lqw.eq(!sex.equals("null") && StringUtils.isNoneBlank(sex), User::getSex, sex);
+        //
+        //    IPage iPage = userService.page(page, lqw);
+        //    return Result.success(iPage.getRecords(),iPage.getTotal());
+        //}catch (Exception e){
+        //    System.out.println("UserController.listByPage:" + e);
+        //    return Result.fail(e.toString());
+        //}
     }
 
     // 删除
-    @DeleteMapping("/{id}")
-    public Result delete(@PathVariable Integer id){
-        boolean res = userService.removeById(id);
-        if(res) return Result.success();
-        else return Result.fail();
+    @DeleteMapping("/{uid}")
+    public Result delete(@PathVariable Integer uid) {
+        try {
+            userService.removeById(uid);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println("用户删除失败！" + e.getStackTrace());
+            return Result.fail();
+        }
     }
 }
 

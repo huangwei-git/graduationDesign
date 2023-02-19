@@ -29,9 +29,6 @@ public class LocationController {
     @GetMapping
     public List<Location> list() {
         List<Location> list = locationService.list();
-        list.forEach(location -> {
-            System.out.println(location);
-        });
         return list;
     }
 
@@ -47,7 +44,6 @@ public class LocationController {
         lqw.eq(type != null, Location::getType, type);
         lqw.select(Location::getName,Location::getLocId);
         List<Location> data = locationService.list(lqw);
-        System.out.println(locationService.getMap(lqw));
         return Result.success(data, data.size());
     }
 
