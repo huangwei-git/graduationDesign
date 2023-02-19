@@ -70,7 +70,7 @@ public class MaterialController {
         page.setSize(query.getPageSize());
 
         LambdaQueryWrapper<Material> lqw = new LambdaQueryWrapper<>();
-        String name = (String) query.getParam().get("name");
+        String name = (String) query.getParams().get("name");
         lqw.like(Material::getName,name);
 
         IPage iPage = materialService.page(page, lqw);

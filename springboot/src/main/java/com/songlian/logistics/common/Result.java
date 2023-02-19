@@ -4,12 +4,12 @@ import lombok.Data;
 
 @Data
 public class Result {
-    private int code;   // 200成功 400失败
+    private Integer code;   // 200成功 400失败
     private String msg;
-    private int total; //总记录数
+    private Long total; //总记录数
     private Object data;
 
-    public static Result result(int code, String msg, int total, Object data) {
+    public static Result result(int code, String msg, long total, Object data) {
         Result res = new Result();
 
         res.setCode(code);
@@ -36,7 +36,7 @@ public class Result {
         return result(200, "成功", 0, data);
     }
 
-    public static Result success(Object data,int total) {
+    public static Result success(Object data,long total) {
         return result(200, "成功", total, data);
     }
 

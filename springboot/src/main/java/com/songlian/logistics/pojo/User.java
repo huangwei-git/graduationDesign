@@ -32,7 +32,7 @@ public class User implements Serializable {
 
     private String phone;
 
-    private Integer post;
+    private Integer job;
 
     @TableField("date_of_entry")
     private LocalDateTime dateOfEntry;

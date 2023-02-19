@@ -1,12 +1,15 @@
 package com.songlian.logistics.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,7 +38,18 @@ public class LocationController {
     // 根据id查询
     @GetMapping("/{id}")
     public Location selectById(@PathVariable Integer id){
-        return locationService.getById(id);}
+        return locationService.getById(id);
+    }
+
+    @GetMapping("/type")
+    public Result selectByType(@RequestParam Integer type) {
+        LambdaQueryWrapper<Location> lqw = new LambdaQueryWrapper();
+        lqw.eq(type != null, Location::getType, type);
+        lqw.select(Location::getName,Location::getLocId);
+        List<Location> data = locationService.list(lqw);
+        System.out.println(locationService.getMap(lqw));
+        return Result.success(data, data.size());
+    }
 
     // 新增
     @PostMapping
