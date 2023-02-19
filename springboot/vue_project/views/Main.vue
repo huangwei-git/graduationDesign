@@ -1,48 +1,126 @@
 <template>
   <div id="root">
     <!-- 搜索栏 -->
-    <div style="margin-bottom: 20px">
+    <div style="margin-bottom: 10px;display: flex;align-items:center;justify-content:space-between;flex-wrap: wrap;">
       <el-date-picker
-          class="sl-no"
-          @change="getDateRange"
-          :editable="false"
           v-model="date"
-          type="daterange"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
+          :editable="false"
+          :clearable="true"
+          @change="getDateRange"
+          unlink-panels
+          :disabled="select == 2"
+          type="datetimerange"
+          value-format="yyyy-MM-ddThh:mm"
           start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :default-time="['00:00:00', '23:59:59']">
+          range-separator="至"
+          end-placeholder="结束日期">
       </el-date-picker>
+
       <el-input placeholder="请输入内容"
+                :clearable="true"
                 :suffix-icon="inputIconClass"
                 v-model="input"
+                style="width: 260px"
                 class="sl-no input-with-select"
                 @keyup.enter.native="search">
-        <el-select class="sl-no"  @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
-          <el-option class="sl-no" label="姓名" :value="1"></el-option>
-          <el-option label="电话" :value="2"></el-option>
-          <el-option label="工号" :value="3"></el-option>
+        <el-select class="sl-no" style="width: 80px"  @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
+          <el-option label="姓名" :value="1"></el-option>
+          <el-option label="工号" :value="2"></el-option>
         </el-select>
       </el-input>
-        <el-select style="margin-left:  5px;width: 150px" class="sl-no"  @change="getChangeValue" v-model="selectSex" placeholder="性别">
-          <el-option
-              v-for="item in sexs"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-          </el-option>
-        </el-select>
-      <el-button type="primary" @click="search" style="margin-left: 5px">搜索</el-button>
-      <el-button type="danger" @click="resetSearch" style="margin-left: 5px">重置</el-button>
+      <el-input
+          :clearable="true"
+          v-show="this.select != 2"
+          place class="sl-no"
+          v-model="phone"
+          suffix-icon="el-icon-phone-outline"
+          style="margin-left:  5px;width: 180px"
+          placeholder="手机号">
+      </el-input>
+      <el-select
+          :clearable="true"
+          v-show="this.select != 2"
+          style="margin-left:  5px;width: 95px" class="sl-no"
+          v-model="selectSex"
+          placeholder="性别">
+        <el-option value="男" label="男">
+          <span style="float: left">男</span>
+          <span style="float: right; color: #8492a6; font-size: 8px">
+            <i class="el-icon-male"></i>
+          </span>
+        </el-option>
+        <el-option value="女" label="女">
+          <span style="float: left">女</span>
+          <span style="float: right; color: #8492a6; font-size: 8px">
+            <i class="el-icon-female"></i>
+          </span>
+        </el-option>
+      </el-select>
+      <el-select
+          :clearable="true"
+          v-show="this.select != 2"
+          style="margin-left:  5px;width: 140px" class="sl-no"
+          v-model="pos"
+          placeholder="运输中心">
+        <el-option
+            v-for="item in locationTable"
+            :key="item.locId"
+            :label="item.name"
+            :value="item.locId">
+        </el-option>
+      </el-select>
+      <el-select
+          :clearable="true"
+          v-show="this.select != 2"
+          style="margin-left:  5px;width: 140px" class="sl-no"
+          v-model="state"
+          placeholder="状态">
+        <el-option label="leisure" value="leisure"></el-option>
+        <el-option label="work" value="work"></el-option>
+        <el-option label="rest" value="rest"></el-option>
+      </el-select>
+      <el-select
+          :clearable="true"
+          v-show="this.select != 2"
+          style="margin-left:  5px;width: 140px" class="sl-no"
+          v-model="job"
+          placeholder="职位">
+        <el-option label="管理员" value="0"></el-option>
+        <el-option label="运输员" value="1"></el-option>
+      </el-select>
+      <div>
+        <el-button-group>
+          <el-button icon="el-icon-search" type="primary" @click="search">搜索</el-button>
+          <el-button icon="el-icon-refresh" type="primary" @click="resetSearch" style="margin-left: 5px">重置</el-button>
+        </el-button-group>
+      </div>
     </div>
-    <el-button-group style="margin-left: 5px;">
-      <el-button type="primary" @click="centerDialogVisible = true;" icon="el-icon-plus">新增员工</el-button>
-      <el-button type="primary" icon="el-icon-minus" @click="handlerDeleteAllSelected" :disabled="handleDisable">批量删除</el-button>
-      <el-button type="primary" icon="el-icon-delete" @click="clearFilter">清除过滤器</el-button>
-      <el-button type="primary" icon="el-icon-upload2">导入数据</el-button>
-      <el-button type="primary" icon="el-icon-download">导出数据</el-button>
-    </el-button-group>
+
+    <div >
+      <el-button-group>
+        <el-button style="background-color:e1f3d8" type="warning" @click="addUser" icon="el-icon-plus">新增员工</el-button>
+        <el-button style="background-color:950842" type="warning" icon="el-icon-minus" @click="handlerDeleteAllSelected" :disabled="handleDisable">批量删除</el-button>
+        <el-button style="background-color:950842" type="warning" icon="el-icon-delete" @click="clearFilter">清除过滤器</el-button>
+        <el-button style="background-color:950842" type="warning" icon="el-icon-upload2">导入数据</el-button>
+        <el-button style="background-color:950842" type="warning" icon="el-icon-download">导出数据</el-button>
+      </el-button-group>
+
+      <div class="sl-no" style="display: inline-block;float: right">
+        <el-select v-model="sortValue" placeholder="排序" style="margin-left: 5px;width: 150px">
+          <el-option label="工号" value="uid"></el-option>
+          <el-option label="姓名" value="name"></el-option>
+          <el-option label="性别" value="sex"></el-option>
+          <el-option label="配送中心" value="locSendId"></el-option>
+          <el-option label="入职时间" value="dateOfEntry"></el-option>
+          <el-option label="状态" value="state"></el-option>
+          <el-option label="职位" value="job"></el-option>
+        </el-select>
+        <el-button-group style="margin-left: 5px">
+          <el-button autofocus icon="el-icon-arrow-up">升序</el-button>
+          <el-button icon="el-icon-arrow-down" style="margin-left: 5px" @click="downSortTable">降序</el-button>
+        </el-button-group>
+      </div>
+    </div>
 
     <el-empty description="暂无数据" v-show="(tableData.length==0 && !loading)"></el-empty>
     <el-table
@@ -55,40 +133,50 @@
         @selection-change="handleSelectionChange"
         :default-sort = "{prop: 'id', order: 'inscending'}"
         :cell-style="{ textAlign: 'center' }"
-        :header-cell-style="{ textAlign: 'center',background:'#f3f6fd',color:'#555' }"
-        @row-click="storeClickedRowInfo"
+        :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
         style="margin-top: 10px;"
+        @row-click="recordRowInfo"
     >
-      <el-table-column align="center" type="selection" width="45"></el-table-column>
-      <el-table-column type="index" width="100">
+      <el-table-column fixed align="center" type="selection" width="45"></el-table-column>
+      <el-table-column fixed type="index" width="60%">
         <template slot="header" slot-scope="scope">序号</template>
       </el-table-column>
-      <el-table-column prop="uid" sortable label="工号" width="150%">
+
+      <el-table-column prop="uid" label="工号" width="70%">
         <template slot-scope="scope">
           <el-tag>{{scope.row.uid}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="name" sortable label="姓名" width="150%"></el-table-column>
-      <el-table-column prop="sex" sortable label="性别" width="120%"></el-table-column>
-      <el-table-column prop="locSendId" sortable label="所在配送中心编号" width="180%"
-                       :filter-method="filterLocation"
-                       :filters="locations"
-                       filter-placement="bottom">
-        <template slot-scope="scope">
-          <span> {{locationMap[scope.row.locSendId]}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" sortable label="手机号" width="200%">
+
+      <el-table-column prop="name"  label="姓名" width="130%"></el-table-column>
+      <el-table-column prop="sex"  label="性别" width="80%"></el-table-column>
+      <el-table-column prop="phone"  label="手机号" width="180%">
         <template slot-scope="scope">
           <i class="el-icon-phone-outline"></i>
           <span> {{scope.row.phone}}</span>
         </template>
       </el-table-column>
+      <el-table-column prop="email"  label="邮箱" width="250%">
+        <template slot-scope="scope">
+          <i class="el-icon-message"></i>
+          <span> {{scope.row.email}}</span>
+        </template>
+      </el-table-column>
 
-      <el-table-column prop="dateOfEntry" sortable label="入职时间" width="230%">
+      <el-table-column prop="dateOfEntry"  label="入职时间" width="230%">
         <template slot-scope="scope">
           <i class="el-icon-time"></i>
           <span> {{scope.row.dateOfEntry}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="locSendId"  label="所在配送中心编号" width="150%"
+                       :filter-method="filterLocation"
+                       :filters="locations"
+                       filter-placement="bottom">
+        <template slot-scope="scope">
+          <i v-show="locationMap[scope.row.locSendId]!=undefined" class="el-icon-location-outline"></i>
+          <span> {{locationMap[scope.row.locSendId]}}</span>
         </template>
       </el-table-column>
 
@@ -122,22 +210,20 @@
           filter-placement="bottom">
         <template slot-scope="scope">
           <el-tag
-              :type="scope.row.job === '管理员' ? 'danger' : 'primary'"
+              :type="scope.row.job === '管理员' ? 'danger' : 'info'"
               disable-transitions
-              effect="dark"
-              style="width: 60px;font-weight: normal;"
+              style="width: 60px;font-weight: bold;"
           >
             {{scope.row.job}}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column prop="operate" width="170%" align="right">
+      <el-table-column fixed="right" prop="operate" width="180%" align="right">
         <template slot="header" slot-scope="scope">操作</template>
         <template slot-scope="scope">
-          <el-button @click="handleClickLook(scope.row)" type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small">删除</el-button>
+          <el-button icon="el-icon-edit" @click="editUser(scope.row)" size="small">编辑</el-button>
+          <el-button icon="el-icon-delete" type="danger" @click="deleteUser" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -200,9 +286,15 @@
               :label="item.name"
               :value="item.locId"></el-option>
           </el-select>
+        </el-form-item><el-form-item v-show="isClickEditBtn" label="状态" prop="state">
+          <el-select v-model="form.state" style="width: 200px">
+            <el-option label="leisure" value="leisure"></el-option>
+            <el-option label="work" value="work"></el-option>
+            <el-option label="rest" value="rest"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+          <el-button type="primary" @click="saveOrUpdate()">{{addBtnText}}</el-button>
           <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -224,8 +316,7 @@ export default {
         let setFilter = new Set();
         this.tableData.forEach(item => {
           // 格式化处理时间
-          let len = item.dateOfEntry.indexOf('T');
-          item.dateOfEntry = item.dateOfEntry.slice(0,len);
+          item.dateOfEntry = item.dateOfEntry.replaceAll('T',' ');
 
           // 职位处理
           if(item.job == 0){
@@ -234,11 +325,6 @@ export default {
           }
           else item.job = "运输员";
 
-
-          // 运输中心处理
-          for(let i = 0;i < this.locationTable.length;i++){
-            this.locationMap[this.locationTable[i].locId] = this.locationTable[i].name;
-          }
           // 获取“运输中心”字段的过滤器数值
           set.add(item.locSendId);
         })
@@ -277,55 +363,136 @@ export default {
           .then(res => {
             this.locationTable = res.data;
             this.form.locSendId = this.defaultLocation = res.data[0].name;
+            // 运输中心处理
+            for(let i = 0;i < this.locationTable.length;i++){
+              this.locationMap[this.locationTable[i].locId] = this.locationTable[i].name;
+            }
           })
     },
     search(){
       if(this.select === 1){
         this.pageData.params.name = this.input;
-        this.pageData.params.phone = '';
         this.pageData.params.uid = '';
-      }else if(this.select === 2){
+      }else if(this.select === 2) {
         this.pageData.params.name = '';
-        this.pageData.params.phone = this.input;
-        this.pageData.params.uid = '';
-      }else{
-        this.pageData.params.name = '';
-        this.pageData.params.phone = '';
         this.pageData.params.uid = this.input;
       }
-      this.pageData.params.startTime = this.date[0];
-      this.pageData.params.endTime = this.date[1];
+      this.pageData.params.phone = this.phone;
+      this.pageData.params.position = this.pos;
+      this.pageData.params.state = this.state;
+      this.pageData.params.job = this.job;
       this.pageData.params.selectSex = this.selectSex;
+      if(this.date != null && this.date != ''){
+        this.pageData.params.startTime = this.date[0];
+        this.pageData.params.endTime = this.date[1];
+      }
       this.loadPost();
     },
     resetSearch(){
+      this.pageData.params.uid = '';
       this.pageData.params.name = '';
+      this.pageData.params.phone = '';
+      this.pageData.params.job = '';
+      this.pageData.params.state = '';
+      this.pageData.params.position = '';
       this.pageData.params.startTime = '';
       this.pageData.params.endTime = '';
-      this.pageData.params.uid = '';
-      this.pageData.params.phone = '';
       this.pageData.params.selectSex = '';
+
+      this.phone = '';
+      this.date = '';
+      this.pos = '';
+      this.state = '';
+      this.job = '';
+      this.selectSex = '';
+
       this.loadPost();
     },
-    //====添加====
+    //====排序====
+    upSortTable(){
+      this.pageData.params.sortField = this.sortValue;
+      this.pageData.params.sortDirection = '0';
+      this.loadPost();
+    },
+    downSortTable(){
+      this.pageData.params.sortField = this.sortValue;
+      this.pageData.params.sortDirection = '1';
+      this.loadPost();
+    },
+    //====添加 修改 删除====
+    // 点击 新增
     addUser(){
       this.centerDialogVisible = true;
-      this.$nextTick(()=>{
-        this.resetForm();
-      })
+      this.addBtnText = '提交';
+      this.isClickEditBtn = false;
+      this.form.state = 'leisure';
     },
-    submitForm(ref){
+    // 点击 编辑
+    editUser(row) {
+      this.addBtnText = '修改';
+      this.isClickEditBtn = true;
+      this.form.uid = row.uid;
+      this.form.name = row.name;
+      this.form.job = row.job;
+      this.form.sex = row.sex;
+      this.form.phone = row.phone;
+      this.form.email = row.email;
+      this.form.locSendId = row.locSendId == '*'?this.defaultLocation:row.locSendId;
+      this.form.state = row.state;
+      if(this.form.job == '管理员') this.form.locSendId = this.defaultLocation;
+      console.log(this.form);
+      this.centerDialogVisible = true;
+    },
+    // 新增用户
+    saveForm(){
       if(this.form.job === '管理员'){
         this.form.job = 0;
         this.form.locSendId = 0;
       }else this.form.job = 1;
-      console.log(this.form);
       this.$confirm('是否确认提交?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
         this.$axios.post(this.$httpUrl+'/user',this.form)
+            .then(res => res.data)
+            .then(res => {
+              if (res.code == 200) {
+                this.$notify({
+                  title: '成功',
+                  message: '添加成功',
+                  type: 'success'
+                });
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: '添加失败'
+                });
+              }
+            })
+      }).then(() => {
+        this.loadPost();
+        this.centerDialogVisible = false;
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+
+    },
+    // 修改用户
+    updateForm(){
+      this.$confirm('是否确认修改?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        if(this.form.job == '管理员'){
+          this.form.job = 0;
+          this.form.locSendId = 0;
+        }else this.form.job  = 1;
+        this.$axios.put(this.$httpUrl+'/user',this.form)
             .then(res => res.data)
             .then(res => {
               if(res.code == 200){
@@ -342,23 +509,65 @@ export default {
               }
             })
       }).then(() => {
-
+        this.loadPost();
+        this.centerDialogVisible = false;
+        //this.resetForm();
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消删除'
         });
       });
-
+    },
+    // 删除用户
+    deleteUser(){
+      this.$confirm(`是否要将${this.clickedRow.name}的信息从表中移除？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios.delete(this.$httpUrl+`/user/${this.clickedRow.uid}`)
+            .then(res => res.data)
+            .then(res => {
+              if(res.code == 200){
+                this.$notify.success({
+                  title:"成功！",
+                  message:`员工"${this.clickedRow.name}"已被删除`,
+                })
+              }else {
+                this.$notify.error({
+                  title:"失败！",
+                  message:"服务器忙，请稍后重试",
+                })
+              }
+            })
+      }).then(() => {
+        this.loadPost();
+      }).catch(() => {
+        this.$notify.info({
+          type: 'info',
+          message: '已取消删除',
+        });
+      });
     },
     resetForm(ref){
+      this.form.uid = '';
       this.form.name = '';
       this.form.sex = '';
       this.form.email = '';
       this.form.phone = '';
       this.form.job = '';
+      this.form.state = '';
       this.form.locSendId = this.defaultLocation;
-      console.log(1);
+    },
+    saveOrUpdate(){
+      if(this.form.uid == ''){
+        console.log(1)
+        this.saveForm();
+      }else{
+        console.log(2)
+        this.updateForm()
+      }
     },
     //====列表条件过滤====
     filterLocation(value, row){
@@ -376,42 +585,33 @@ export default {
     //====分页查询====
     handleSizeChange(val) {
       this.pageData.pageSize = val;
+      this.pageData.pageNum = 1;
       this.loadPost();
     },
     handleCurrentChange(val) {
       this.pageData.pageNum = val;
-      console.log(this.pageData);
       this.loadPost();
     },
     // 控制搜索栏中，标签样式
     getChangeValue(){
-      console.log(this.select)
       if(this.select === 2){
-        this.inputIconClass = 'el-icon-phone-outline';
-      }else if(this.select === 3){
-        this.inputIconClass = 'el-icon-location-information';
+        this.inputIconClass = 'el-icon-postcard';
       }else{
         this.inputIconClass = 'el-icon-user';
       }
     },
     // 获得选择的时间范围
     getDateRange(){
-      this.pageData.params = {
-        startTime:this.date[0],
-        endTime:this.date[1],
-      }
-    console.log(this.date[0] === this.tableData[0].dateOfEntry);
-    },
-    // “查看”操作
-    handleClickLook(row) {
-      console.log(row.uid);
-      console.log(row.name);
-      console.log(row.locSendId);
-      console.log(row.phone);
-      console.log(row.dateOfEntry);
-      console.log(row.email);
-      console.log(row.state);
-      console.log(row.job);
+      if(this.date != null){
+          this.pageData.params.startTime = this.date[0];
+          this.pageData.params.endTime = this.date[1];
+        }else{
+          this.date = '';
+          this.pageData.params.startTime = '';
+          this.pageData.params.endTime = '';
+        }
+      console.log(this.pageData.params.startTime)
+      console.log(this.pageData.params.endTime)
     },
     handleSelectionChange(val) {
       if(val.length) this.handleDisable = false;
@@ -425,15 +625,19 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log("需要删除：")
-        this.currentSelected.forEach(item => {
-          console.log(item.id,item.date,item.name,item)
-        })
-        this.$notify.success({
-          title:"删除成功！",
-          message:"删除"+this.currentSelected.length+"条记录",
-        })
-        console.log("共"+this.currentSelected.length+"个")
+        this.$notify.error({
+          title: '删除失败',
+          message: '权限不足'
+        });
+        //console.log("需要删除：")
+        //this.currentSelected.forEach(item => {
+        //  console.log(item.id,item.date,item.name,item)
+        //})
+        //this.$notify.success({
+        //  title:"删除成功！",
+        //  message:"删除"+this.currentSelected.length+"条记录",
+        //})
+        //console.log("共"+this.currentSelected.length+"个")
       }).catch(() => {
         this.$notify.info({
           type: 'info',
@@ -441,27 +645,9 @@ export default {
         });
       });
     },
-    // “删除”操作
-    storeClickedRowInfo(row,column,event){
-      if(column.property === "operate"
-          && event.target.innerText.includes("删除")){
-        this.$confirm(`是否要将${row.name}的信息从表中移除？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$notify.success({
-            title:"删除成功！",
-            message:row.id + " " + row.name,
-          })
-          console.log(row.name)
-        }).catch(() => {
-          this.$notify.info({
-            type: 'info',
-            message: '已取消删除',
-          });
-        });
-      }
+    // 获取被点击的行信息
+    recordRowInfo(row){
+      this.clickedRow = row;
     },
   },
   data(){
@@ -474,6 +660,10 @@ export default {
       sideWidth:220,
       input:'',
       select:1,
+      phone:'',
+      pos:'',
+      state:'',
+      job:'',
       date:['',''],
       loading: true,
       inputIconClass:'el-icon-user',
@@ -481,32 +671,41 @@ export default {
       currentSelected:[],
       clickedRowInfo:null,
       selectSex:'',
-      sexs:[
-        {label:'男',value:'男',},
-        {label:'女',value:'女',}
-      ],
       pageData:{
         pageNum:1,
         totalPage:22,
         pageSize:5,
         params:{
+          uid:'',
           name:'',
+          phone:'',
+          job:'',
+          state:'',
+          position:'',
           startTime:'',
           endTime:'',
-          uid:'',
-          phone:'',
-          selectSex:''
+          selectSex:'',
+          sortField:'',
+          sortDirection:'',
         },
       },
       centerDialogVisible:false,
       locationTable:[],
+      isClickEditBtn:false,
+      addBtnText:'提交',
+      sortValue:'uid',//排序字段
+      sortDirection:'0',// 0升序，1降序
+      clickedRow:'',// 获取被点击的行信息
       form:{
+        uid:'',
         name:'',
         sex:'',
         email:'',
         phone:'',
+        state:'',
         job:'',
         locSendId:'',
+        position:'',
       },
       defaultLocation:'',
       rules: {
@@ -526,7 +725,7 @@ export default {
         ],
         email:[
             { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-            { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+            { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur'] }
         ]
       },
       // 对话框
@@ -537,6 +736,15 @@ export default {
     this.$nextTick(()=>{
       this.loadPost();
     })
+  },
+  watch:{
+    centerDialogVisible:{
+      handler(nval,oval){
+        if(nval == false)
+          this.resetForm();
+      }
+    }
+
   }
 }
 </script>
@@ -556,5 +764,4 @@ export default {
   margin-left: 5px;
   background-color: #fff;
 }
-
 </style>
