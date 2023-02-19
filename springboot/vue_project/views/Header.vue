@@ -23,7 +23,7 @@
       </div>
       <el-dropdown-menu align="center" slot="dropdown">
         <el-dropdown-item>个人主页</el-dropdown-item>
-        <el-dropdown-item>退出</el-dropdown-item>
+        <el-dropdown-item @click.native="logOut">退出登录</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </div>
@@ -38,7 +38,8 @@ export default {
       collapseBtnClass:'el-icon-s-fold',
       sideNavState:'收起',
       sideWidth:220,
-      isCollapse:false
+      isCollapse:false,
+      visible:false,
     }
   },
   methods:{
@@ -59,8 +60,30 @@ export default {
       this.$bus.$emit('sendSideWidth',this.sideWidth);
       this.$bus.$emit('sendIsCollapse',this.isCollapse);
     },
+    logOut(){
+      this.$confirm('是否要退出当前登录账号？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$router.push('/login');
+        this.$message({
+          type: 'success',
+          message: '退出成功!'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消退出'
+        });
+      });
+    }
   },
-
+  beforeMount() {
+    this.username = sessionStorage.getItem("username")?
+        JSON.parse(sessionStorage.getItem("username")):{};
+    console.log(this.username);
+  }
 }
 </script>
 
