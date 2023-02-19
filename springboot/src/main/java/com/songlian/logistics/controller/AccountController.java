@@ -1,8 +1,11 @@
 package com.songlian.logistics.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Account;
 import com.songlian.logistics.service.AccountService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +58,12 @@ public class AccountController {
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable Integer id){
         return accountService.removeById(id);
+    }
+
+    // 登录验证
+    @PostMapping("/login")
+    public Result login(@RequestBody Account account) {
+        return accountService.login(account);
     }
 }
 

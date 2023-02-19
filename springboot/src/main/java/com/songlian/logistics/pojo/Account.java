@@ -1,7 +1,6 @@
 package com.songlian.logistics.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,8 +18,8 @@ import lombok.EqualsAndHashCode;
 public class Account {
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "account_id",type = IdType.AUTO)
-    private Integer accountId;
+    @TableId(type = IdType.AUTO)
+    private Integer uid;
 
     private String password;
 }

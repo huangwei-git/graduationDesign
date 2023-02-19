@@ -1,5 +1,6 @@
 package com.songlian.logistics.service;
 
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Account;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
@@ -14,5 +15,5 @@ import org.springframework.stereotype.Service;
  */
 
 public interface AccountService extends IService<Account> {
-
+    public Result login(Account account);
 }

@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
-import com.songlian.logistics.dao.UserDao;
+import com.songlian.logistics.pojo.Account;
 import com.songlian.logistics.pojo.User;
+import com.songlian.logistics.service.AccountService;
 import com.songlian.logistics.service.UserService;
+import com.songlian.logistics.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -26,6 +27,8 @@ class SpringbootApplicationTests {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private AccountService accountService;
 
     @Test
     void contextLoads() {
@@ -68,7 +71,11 @@ class SpringbootApplicationTests {
         iPage.getRecords().forEach(item -> {
             System.out.println(item);
         });
+    }
 
+    @Test
+    public void testAccountLogin(){
+            userService.getById(1);
     }
 
 }
