@@ -56,7 +56,7 @@ export default {
                   sessionStorage.setItem("uid",JSON.stringify(this.uid));
                   sessionStorage.setItem("password",JSON.stringify(this.password));
                   // 页面跳转
-                  this.$router.push("/home");
+                  this.$router.push("/");
                   this.$notify({
                     title: '登录成功',
                     message: `你好，${res.data.name}登录成功`,

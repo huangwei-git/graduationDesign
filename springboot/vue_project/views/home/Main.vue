@@ -116,7 +116,7 @@
           <el-option label="职位" value="job"></el-option>
         </el-select>
         <el-button-group style="margin-left: 5px">
-          <el-button autofocus icon="el-icon-arrow-up">升序</el-button>
+          <el-button autofocus icon="el-icon-arrow-up" @click="upSortTable">升序</el-button>
           <el-button icon="el-icon-arrow-down" style="margin-left: 5px" @click="downSortTable">降序</el-button>
         </el-button-group>
       </div>
@@ -244,7 +244,7 @@
     </div>
 
     <el-dialog
-        title="提示"
+        title="用户信息"
         :visible.sync="centerDialogVisible"
         width="23%"
         center>

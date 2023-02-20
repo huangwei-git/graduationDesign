@@ -11,7 +11,8 @@
         </el-header>
 
         <el-main>
-          <Main/>
+          <!--<Main/>-->
+          <MaterialMain/>
         </el-main>
       </el-container>
     </el-container>
@@ -22,6 +23,7 @@
 import Aside from "./Aside.vue"
 import Header from "./Header.vue"
 import Main from "./Main.vue"
+import MaterialMain from '../material/materialInfo.vue'
 
 export default {
   name: "Home",
@@ -37,6 +39,7 @@ export default {
     Aside,
     Header,
     Main,
+    MaterialMain,
   },mounted() {
     this.$bus.$on("sendSideWidth",data => {
       this.sideWidth = data;
