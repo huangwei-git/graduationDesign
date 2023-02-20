@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
+import com.songlian.logistics.dao.LocationDao;
 import com.songlian.logistics.dao.MaterialDao;
+import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.pojo.User;
 import com.songlian.logistics.service.AccountService;
 import com.songlian.logistics.service.MaterialService;
@@ -33,6 +35,8 @@ class SpringbootApplicationTests {
     private MaterialService materialService;
     @Autowired
     private MaterialDao materialDao;
+    @Autowired
+    private LocationDao locationDao;
 
     @Test
     void contextLoads() {
@@ -59,7 +63,9 @@ class SpringbootApplicationTests {
     @Test
     public void TestJoin(){
         //System.out.println(materialDao.getOne());
-        System.out.println(materialDao.getMaterialCount());
+        //System.out.println(materialDao.getMaterialCount());
+        //System.out.println(materialDao.getOne());
+        System.out.println(locationDao.testloc());
     }
 
     @Test

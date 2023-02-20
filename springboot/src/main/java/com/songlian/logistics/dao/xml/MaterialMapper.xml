@@ -19,7 +19,7 @@
         GROUP BY(inv.material_id);
     </select>
 
-    <!--<select id="getOne" resultType="com.songlian.logistics.pojo.Material">-->
-    <!--    select * from material where materialiD=1;-->
-    <!--</select>-->
+    <select id="getOne" resultType="com.songlian.logistics.pojo.Material">
+        select * from material where materialiD=1;
+    </select>
 </mapper>

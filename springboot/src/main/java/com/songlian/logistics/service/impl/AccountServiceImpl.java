@@ -13,9 +13,11 @@ import com.songlian.logistics.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountDao, Account> implements AccountService {
-    @Autowired
+    @Resource
     private UserService userService;
 
     @Override

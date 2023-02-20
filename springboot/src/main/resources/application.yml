@@ -10,4 +10,4 @@ spring:
     password: HuangWei17
 
 mybatis-plus:
-  mapper-locations: classpath:com/songlian/logistics/mapper/xml/*.xml
+  mapper-locations: classpath*:com/songlian/logistics/dao/xml/*.xml
