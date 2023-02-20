@@ -2,7 +2,6 @@ package com.songlian.logistics.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
@@ -31,7 +30,7 @@ public class Material implements Serializable {
 
     private Integer price;
 
-    private Double occupy;
+    private Integer volume;
 
     @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;

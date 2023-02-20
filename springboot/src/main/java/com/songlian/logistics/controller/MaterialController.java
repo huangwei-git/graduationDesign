@@ -1,9 +1,6 @@
 package com.songlian.logistics.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Material;
@@ -11,7 +8,6 @@ import com.songlian.logistics.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,12 +26,13 @@ public class MaterialController {
 
     // 查询全部
     @GetMapping
-    public List<Material> list() {
-        List<Material> list = materialService.list();
-        list.forEach(material -> {
-            System.out.println(material);
-        });
-        return list;
+    public Result list() {
+        try {
+            List<Material> list = materialService.list();
+            return Result.success(list,list.size());
+        }catch (Exception e){
+            return Result.fail("Material's list fail:" + e);
+        }
     }
 
     // 根据id查询
@@ -46,52 +43,54 @@ public class MaterialController {
 
     // 新增
     @PostMapping
-    public boolean save(@RequestBody Material material){
-        return materialService.save(material);
+    public Result save(@RequestBody Material material) {
+        try {
+            System.out.println(material);
+            materialService.save(material);
+            return Result.success();
+        }catch (Exception e){
+            return Result.fail("Material's save fail:" + e);
+        }
     }
 
     // 修改
     @PutMapping
-    public boolean modify(@RequestBody Material material){
-        return materialService.updateById(material);
+    public Result modify(@RequestBody Material material){
+        try {
+            materialService.updateById(material);
+            return Result.success();
+        }catch (Exception e){
+            return Result.error("Material's modify fail:" + e);
+        }
     }
 
     // 删除
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable Integer id){
-        return materialService.removeById(id);
+    public Result delete(@PathVariable Integer id){
+        if(materialService.getById(id) == null){
+            try {
+                return Result.fail("该id不存在");
+            }catch (Exception e){
+                return Result.error("服务器忙，请稍后重试");
+            }
+        }else{
+            try {
+                materialService.removeById(id);
+                return Result.success();
+            }catch (Exception e){
+                return Result.error("删除记录时出现错误:" + e);
+            }
+        }
     }
 
     // 分页查询1
     @PostMapping("/listPage")
-    public List<Material> list(@RequestBody QueryPageParam query){
-        Page<Material> page = new Page<>();
-        page.setCurrent(query.getPageNum());
-        page.setSize(query.getPageSize());
-
-        LambdaQueryWrapper<Material> lqw = new LambdaQueryWrapper<>();
-        String name = (String) query.getParams().get("name");
-        lqw.like(Material::getName,name);
-
-        IPage iPage = materialService.page(page, lqw);
-
-        System.out.println(iPage.getTotal());
-
-        return iPage.getRecords();
-    }
-
-    // 分页查询2: 在Service端创建Ipage
-    @PostMapping("listPageByService")
-    public List<Material> list2(@RequestBody QueryPageParam query){
-        Page<Material> page = new Page<>();
-        page.setCurrent(query.getPageNum());
-        page.setSize(query.getPageSize());
-
-        IPage iPage = materialService.genPage(page);
-
-        System.out.println(iPage.getTotal());
-
-        return iPage.getRecords();
+    public Result list(@RequestBody QueryPageParam query){
+        try {
+            return materialService.pageList(query);
+        }catch (Exception e){
+            return Result.error(e.getMessage());
+        }
     }
 }
 

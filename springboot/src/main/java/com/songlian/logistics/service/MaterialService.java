@@ -3,6 +3,8 @@ package com.songlian.logistics.service;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.songlian.logistics.common.QueryPageParam;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Material;
 
 /**
@@ -14,6 +16,6 @@ import com.songlian.logistics.pojo.Material;
  * @since 2023-02-17
  */
 public interface MaterialService extends IService<Material> {
-    IPage genPage(IPage<Material> page);
+    public Result pageList(QueryPageParam query);
 
 }
