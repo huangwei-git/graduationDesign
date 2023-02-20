@@ -7,16 +7,32 @@
       <div>
         <el-input placeholder="请输入内容"  :maxlength="searchLength" show-word-limit v-model="searchValue" class="input-with-select">
           <el-select @change="lengthLimit" style="width: 115px" v-model="searchSelect" slot="prepend" placeholder="请选择">
-            <el-option  label="物品名称" value="1"></el-option>
-            <el-option  label="物品编号" value="2"></el-option>
+            <el-option  label="地点名称" value="1"></el-option>
+            <el-option  label="地点ID" value="2"></el-option>
           </el-select>
         </el-input>
+        <el-form :model="searchPos" :rules="rules" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
+          <el-form-item prop="xpos">
+            <el-input v-model="searchPos.xpos" placeholder="x坐标" :maxlength="4"></el-input>
+          </el-form-item>
+        </el-form>
+
+        <el-form :model="searchPos" :rules="rules" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
+          <el-form-item prop="ypos">
+            <el-input v-model="searchPos.ypos" placeholder="y坐标" :maxlength="4"></el-input>
+          </el-form-item>
+        </el-form>
+
+        <el-select v-model="searchType" placeholder="地点类型" style="margin-left: 5px;width: 150px;">
+          <el-option value="0" label="运输中心"></el-option>
+          <el-option value="1" label="需求地"></el-option>
+        </el-select>
 
         <el-button-group style="margin-left: 5px">
           <el-button icon="el-icon-search" type="primary" @click="search">搜索</el-button>
           <el-button icon="el-icon-refresh" type="primary" @click="resetSearch" style="margin-left: 5px">重置</el-button>
         </el-button-group>
-        </div>
+      </div>
     </div>
 
     <div >
@@ -28,11 +44,10 @@
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
-          <el-option label="编号" value="materialId"></el-option>
+          <el-option label="地点ID" value="locId"></el-option>
           <el-option label="名称" value="name"></el-option>
-          <el-option label="成本" value="cost"></el-option>
-          <el-option label="单价" value="price"></el-option>
-          <el-option label="空间占用率" value="volume"></el-option>
+          <el-option label="坐标" value="xpos"></el-option>
+          <el-option label="地点类型" value="type"></el-option>
         </el-select>
         <el-button-group style="margin-left: 5px">
           <el-button autofocus icon="el-icon-arrow-up" @click="upSortTable">升序</el-button>
@@ -56,7 +71,7 @@
           :default-sort = "{prop: 'mid', order: 'inscending'}"
           :cell-style="{ textAlign: 'center' }"
           :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
-          style="margin-top: 10px;width: 761px;"
+          style="margin-top: 10px;width: 661px;"
           @row-click="recordRowInfo"
       >
 
@@ -64,22 +79,30 @@
           <template slot="header" slot-scope="scope">序号</template>
         </el-table-column>
 
-        <el-table-column prop="materialId" label="物品编号" width="100%">
+        <el-table-column prop="locId" label="地点ID" width="100%">
           <template slot-scope="scope">
-            <el-tag>{{scope.row.materialId}}</el-tag>
+            <el-tag>{{scope.row.locId}}</el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column prop="name"  label="物品名称" width="100px"></el-table-column>
-        <el-table-column prop="cost"  label="物品成本" width="100px"></el-table-column>
-        <el-table-column prop="price"  label="物品单价" width="100px"></el-table-column>
-        <el-table-column prop="volume"  label="运输量/车" width="120px"></el-table-column>
+        <el-table-column prop="name"  label="地点名称" width="100px"></el-table-column>
+        <el-table-column  label="地点类型" width="120px">
+          <template slot-scope="scope">
+            <el-tag v-show="scope.row.type == 0" type="danger">运输中心</el-tag>
+            <el-tag v-show="scope.row.type == 1" type="warning">需求地</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="坐标" width="100px">
+          <template slot-scope="scope">
+            ( {{scope.row.xpos}} , {{scope.row.ypos}} )
+          </template>
+        </el-table-column>
 
         <el-table-column prop="operate" width="180px" align="right">
           <template slot="header" slot-scope="scope">操作</template>
           <template slot-scope="scope">
             <el-button icon="el-icon-edit" @click="editTable(scope.row)" size="small">编辑</el-button>
-            <el-button icon="el-icon-delete" type="danger" @click="deleteMaterial" size="small">删除</el-button>
+            <el-button icon="el-icon-delete" type="danger" @click="deleteLocation" size="small">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -104,25 +127,28 @@
 
     <!-- 对话框 增、改信息 -->
     <el-dialog
-        title="物品信息"
+        title="地点信息"
         :visible.sync="centerDialogVisible"
         width="20%"
         center>
-      <el-form :model="form" :rules="rules"  ref="addForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label=物品名称 prop="name">
-            <el-input style="width: 180px" v-model="form.name"></el-input>
+      <el-form :model="form" :rules="rules" ref="addForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label=地点名称 prop="name">
+          <el-input v-model="form.name"></el-input>
         </el-form-item>
 
-        <el-form-item label="单位成本" prop="cost">
-          <el-input-number @change="updatePriceMin" v-model="form.cost" :min="1" :step="1" step-strictly></el-input-number>
+        <el-form-item label="地点类型" prop="type">
+          <el-radio-group v-model="form.type">
+            <el-radio label="运输中心" value="0"></el-radio>
+            <el-radio label="需求地" value="1"></el-radio>
+          </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="物品单价" prop="price">
-          <el-input-number v-model="form.price" :step="1" :min="minPrice" step-strictly></el-input-number>
+        <el-form-item label="x坐标" prop="xpos">
+          <el-input v-model="form.xpos"></el-input>
         </el-form-item>
 
-        <el-form-item label="运输量/车" prop="volume">
-          <el-input-number v-model="form.volume" :step="1" :min="1" step-strictly></el-input-number>
+        <el-form-item label="y坐标" prop="ypos">
+          <el-input v-model="form.ypos"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -154,7 +180,7 @@ export default {
       })
     },
     loadPost(){
-      this.$axios.post(this.$httpUrl+'/material/listPage',this.pageData)
+      this.$axios.post(this.$httpUrl+'/location/listPage',this.pageData)
           .then(res => res.data)
           .then(res => {
             this.loading = true;
@@ -163,31 +189,37 @@ export default {
           })
     },
     search(){
+      console.log("search")
       if(this.searchSelect == 1){
         this.pageData.params.name = this.searchValue;
-        this.loadPost();
       }else{
         let reg = /^[1-9]+[0-9]*$/
         if(reg.test(this.searchValue) || this.searchValue == ''){
-          this.pageData.params.materialId = this.searchValue;
-          this.loadPost();
+          this.pageData.params.locId = this.searchValue;
         }else{
           this.$message.error('输入不合法，请输入大于0的数字！');
+          return ;
         }
       }
+      this.pageData.params.xpos = this.searchPos.xpos;
+      this.pageData.params.ypos = this.searchPos.ypos;
+      this.pageData.params.type = this.searchType;
+      console.log(this.pageData.params);
+      
+      this.loadPost();
     },
     resetSearch(){
-      this.pageData.params.materialId = '';
+      this.pageData.params.locId = '';
       this.pageData.params.name = '';
-      this.pageData.params.cost = '';
-      this.pageData.params.price = '';
-      this.pageData.params.volume = '';
+      this.pageData.params.xpos = '';
+      this.pageData.params.ypos = '';
+      this.pageData.params.type = '';
 
       this.searchMid = '';
       this.searchValue = '';
-      this.searchCost = '';
-      this.searchPrice = '';
-      this.searchOccupy = '';
+      this.searchPos.xpos = '';
+      this.searchPos.ypos = '';
+      this.searchType = '';
 
       this.loadPost();
     },
@@ -213,11 +245,11 @@ export default {
     editTable(row) {
       this.addBtnText = '修改';
       this.isClickEditBtn = true;
-      this.form.materialId = row.materialId;
+      this.form.locId = row.locId;
       this.form.name = row.name;
-      this.form.cost = row.cost;
-      this.form.price = row.price;
-      this.form.volume = row.volume;
+      this.form.xpos = row.xpos;
+      this.form.ypos = row.ypos;
+      this.form.type = row.type == 0?'运输中心':'需求地';
       this.centerDialogVisible = true;
     },
     // 新增用户
@@ -227,24 +259,34 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
-        this.$axios.post(this.$httpUrl+'/material',this.form)
-            .then(res => res.data)
-            .then(res => {
-              if (res.code == 200) {
-                console.log("sss");
-                this.$notify({
-                  title: '成功',
-                  message: '添加成功',
-                  type: 'success'
-                });
-              } else {
-                console.log("fff");
-                this.$notify.error({
-                  title: '错误',
-                  message: '添加失败'
-                });
-              }
-            })
+        this.$refs.addForm.validate(valid=>{
+          this.$axios.post(this.$httpUrl+'/location',this.form)
+              .then(res => res.data)
+              .then(res => {
+                if (res.code == 200) {
+                  console.log("sss");
+                  this.$notify({
+                    title: '成功',
+                    message: '添加成功',
+                    type: 'success'
+                  });
+                } else {
+                  console.log(res.code)
+                  if(res.code == 401){
+                    this.$notify.error({
+                      title:"错误",
+                      message:res.msg
+                    })
+                  }else{
+                    this.$notify.error({
+                      title: '错误',
+                      message: '添加失败'
+                    });
+                  }
+                }
+              })
+        })
+
       }).then(() => {
         this.loadPost();
         this.centerDialogVisible = false;
@@ -263,7 +305,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
-        this.$axios.put(this.$httpUrl+'/material',this.form)
+        this.$axios.put(this.$httpUrl+'/location',this.form)
             .then(res => res.data)
             .then(res => {
               if(res.code == 200){
@@ -290,13 +332,13 @@ export default {
       });
     },
     // 删除用户
-    deleteMaterial(){
+    deleteLocation(){
       this.$confirm(`是否要将${this.clickedRow.name}的信息从表中移除？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$axios.delete(this.$httpUrl+`/material/${this.clickedRow.materialId}`)
+        this.$axios.delete(this.$httpUrl+`/location/${this.clickedRow.locId}`)
             .then(res => res.data)
             .then(res => {
               if(res.code == 200){
@@ -321,22 +363,24 @@ export default {
       });
     },
     resetForm(ref){
-      this.form.materialId = '';
+      this.form.locId = '';
       this.form.name = '';
-      this.form.cost = '';
-      this.form.price = '';
-      this.form.volume = '';
+      this.form.xpos = '';
+      this.form.ypos = '';
+      this.form.type = '';
     },
     saveOrUpdate(){
-      console.log(this.form);
-      if(this.form.materialId == '') this.saveForm();
+      if(this.form.type == '运输中心') this.form.type = 0;
+      else this.form.type = 1;
+
+      if(this.form.locId == '') this.saveForm();
       else this.updateForm();
     },
     //====更新价格限制====
-    updatePriceMin(){
-      this.minPrice = this.form.cost + 1;
-      if(this.form.price <= this.minPrice){
-        this.form.price = this.minPrice;
+    updateyposMin(){
+      this.minypos = this.form.xpos + 1;
+      if(this.form.ypos <= this.minypos){
+        this.form.ypos = this.minypos;
       }
     },
     //====搜索栏字数限制====
@@ -365,28 +409,31 @@ export default {
   data(){
     return {
       tableData:[],
+      locationList:[],
       input:'',
       searchMid:'',
       searchValue:'',
-      searchCost:'',
-      searchPrice:'',
-      searchOccupy:'',
+      searchPos:{
+        xpos:'',
+        ypos:'',
+      },
+      searchType:'',
       searchSelect:'1',
       searchLength:'',
       loading: true,
-      minPrice:2,
-      volumeStep:0.1,
+      minypos:2,
+      typeStep:0.1,
       clickedRowInfo:null,
       pageData:{
         pageNum:1,
         totalPage:22,
         pageSize:5,
         params:{
-          materialId:'',
+          locId:'',
           name:'',
-          cost:'',
-          price:'',
-          volume:'',
+          xpos:'',
+          ypos:'',
+          type:'',
           sortField:'',
           sortDirection:'',
         },
@@ -394,38 +441,37 @@ export default {
       centerDialogVisible:false,
       isClickEditBtn:false,
       addBtnText:'提交',
-      sortField:'materialId',//排序字段
+      sortField:'locId',//排序字段
       sortDirection:'0',// 0升序，1降序
       clickedRow:'',// 获取被点击的行信息
       form:{
-        materialId:'',
+        locId:'',
         name:'',
-        cost:'',
-        price:'',
-        volume:'',
+        xpos:'',
+        ypos:'',
+        type:'',
       },
       defaultLocation:'',
       rules: {
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 1, max: 8, message: '长度为 1 到 8 ', trigger: 'blur' }
+          { min: 1, max: 8, message: '长度为 1 到 8 ', trigger: 'blur' },
+          { pattern:/^\S*$/, message: '不能包含空格', trigger: 'blur' },
         ],
-        phone: [
-          { required: true, message: '手机号不能为空', trigger: 'blur' },
-          {pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/ ,message: '请输入正确的手机号', trigger: 'blur'}
+        xpos:[
+          { required: true, message: '请输入x坐标', trigger: 'blur' },
+          { pattern: /^[0-9]*$/, message: '必须为数字' ,trigger:['blur','change']},
+          { min: 1, max: 4, message: '范围为1-9999', trigger: 'blur' }
         ],
-        sex:[
-          { required: true}
+        ypos:[
+          { required: true, message: '请输入y坐标', trigger: 'blur' },
+          { pattern: /^[0-9]*$/, message: '必须为数字' ,trigger:['blur','change']},
+          { min: 1, max: 4, message: '范围为1-9999', trigger: 'blur' }
         ],
-        job:[
-          {required: true}
+        type:[
+          { required: true, message: '请选择地点类型', trigger: 'blur' },
         ],
-        email:[
-          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur'] }
-        ]
       },
-      // 对话框
     }
   },
   beforeMount() {

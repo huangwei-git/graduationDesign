@@ -30,9 +30,9 @@ public class Location implements Serializable {
 
     private Integer type;
 
-    private Double xpos;
+    private Integer xpos;
 
-    private Double ypos;
+    private Integer ypos;
 
     @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;

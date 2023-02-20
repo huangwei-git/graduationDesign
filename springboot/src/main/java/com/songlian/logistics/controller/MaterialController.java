@@ -60,7 +60,7 @@ public class MaterialController {
             materialService.updateById(material);
             return Result.success();
         }catch (Exception e){
-            return Result.error("Material's modify fail:" + e);
+            return Result.serviceError("Material's modify fail:" + e);
         }
     }
 
@@ -71,14 +71,14 @@ public class MaterialController {
             try {
                 return Result.fail("该id不存在");
             }catch (Exception e){
-                return Result.error("服务器忙，请稍后重试");
+                return Result.serviceError("服务器忙，请稍后重试");
             }
         }else{
             try {
                 materialService.removeById(id);
                 return Result.success();
             }catch (Exception e){
-                return Result.error("删除记录时出现错误:" + e);
+                return Result.serviceError("删除记录时出现错误:" + e);
             }
         }
     }
@@ -89,7 +89,7 @@ public class MaterialController {
         try {
             return materialService.pageList(query);
         }catch (Exception e){
-            return Result.error(e.getMessage());
+            return Result.serviceError(e.getMessage());
         }
     }
 }

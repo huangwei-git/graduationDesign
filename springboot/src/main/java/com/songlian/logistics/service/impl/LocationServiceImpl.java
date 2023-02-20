@@ -1,13 +1,17 @@
 package com.songlian.logistics.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.songlian.logistics.common.Constants;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.LocationDao;
+import com.songlian.logistics.exception.RequestExpcetion;
+import com.songlian.logistics.exception.ServiceException;
 import com.songlian.logistics.pojo.Location;
-import com.songlian.logistics.pojo.Material;
+import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.service.LocationService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl extends ServiceImpl<LocationDao, Location> implements LocationService {
     @Override
-    public Result pageList(QueryPageParam query) {
+    public Result pageList(QueryPageParam query) throws RequestExpcetion {
         try {
             System.out.println("query = " + query);
             // 获取分页参数
@@ -35,54 +39,58 @@ public class LocationServiceImpl extends ServiceImpl<LocationDao, Location> impl
             // 实例对象参数
             String name = (String) query.getParams().get("name");
 
-            Integer mid = s2i((String) query.getParams().get("materialId"), -1);
-            if(mid != null && mid == -1) return Result.fail("materialId参数错误");
+            Integer mid = s2i((String) query.getParams().get("locId"), -1);
+            if(mid != null && mid == -1){
+                throw new RequestExpcetion(Constants.CODE_401,"locId参数错误");
+            }
 
-            Integer price = s2i((String) query.getParams().get("price"), -1);
-            if(price != null && price == -1) return Result.fail("price参数错误");
+            Integer xpos = s2i((String) query.getParams().get("xpos"), -1);
+            if(xpos != null && xpos == -1){
+                throw new RequestExpcetion(Constants.CODE_401,"xpos参数错误");
+            }
 
-            Integer cost = s2i((String) query.getParams().get("cost"), -1);
-            if(cost != null && cost == -1) return Result.fail("cost参数错误");
+            Integer ypos = s2i((String) query.getParams().get("ypos"), -1);
+            if(ypos != null && ypos == -1){
+                throw new RequestExpcetion(Constants.CODE_401,"ypos参数错误");
+            }
 
-            Integer volume = s2i((String) query.getParams().get("volume"), -1);
-            if(volume!= null && volume == -1) return Result.fail("volume参数错误");
-
+            Integer type = s2i((String) query.getParams().get("type"), -1);
+            if(type!= null && type == -1){
+                throw new RequestExpcetion(Constants.CODE_401,"type参数错误");
+            }
 
             // 初始化分页信息
-            Page<Material> page = new Page<>();
+            Page<Location> page = new Page<>();
             page.setSize(size);
             page.setCurrent(num);
             // 查询条件
-            LambdaQueryWrapper<Material> lqw = new LambdaQueryWrapper();
+            LambdaQueryWrapper<Location> lqw = new LambdaQueryWrapper();
             if(!sortField.equals("null") && StringUtils.isNotBlank(sortField)){
                 if(sortDirection.equals("1")){
-                    if(sortField.equals("sortField"))lqw.orderByDesc(Material::getMaterialId);
-                    else if(sortField.equals("name"))lqw.orderByDesc(Material::getName);
-                    else if(sortField.equals("cost"))lqw.orderByDesc(Material::getCost);
-                    else if(sortField.equals("price"))lqw.orderByDesc(Material::getPrice);
-                    else if(sortField.equals("volume"))lqw.orderByDesc(Material::getVolume);
+                    if(sortField.equals("locId"))lqw.orderByDesc(Location::getLocId);
+                    else if(sortField.equals("name"))lqw.orderByDesc(Location::getName);
+                    else if(sortField.equals("xpos"))lqw.orderByDesc(Location::getXpos);
+                    else if(sortField.equals("ypos"))lqw.orderByDesc(Location::getYpos);
+                    else if(sortField.equals("type"))lqw.orderByDesc(Location::getType);
                 }else{
-                    if(sortField.equals("sortField"))lqw.orderByAsc(Material::getMaterialId);
-                    else if(sortField.equals("name"))lqw.orderByAsc(Material::getName);
-                    else if(sortField.equals("cost"))lqw.orderByAsc(Material::getCost);
-                    else if(sortField.equals("price"))lqw.orderByAsc(Material::getPrice);
-                    else if(sortField.equals("volume"))lqw.orderByAsc(Material::getVolume);
+                    if(sortField.equals("locId"))lqw.orderByAsc(Location::getLocId);
+                    else if(sortField.equals("name"))lqw.orderByAsc(Location::getName);
+                    else if(sortField.equals("xpos"))lqw.orderByAsc(Location::getXpos);
+                    else if(sortField.equals("ypos"))lqw.orderByAsc(Location::getYpos);
+                    else if(sortField.equals("type"))lqw.orderByAsc(Location::getType);
                 }
             }
-            lqw.eq(mid != null,Material::getMaterialId,mid);
-            lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),Material::getName,name);
-            lqw.eq(cost != null ,Material::getCost,cost);
-            lqw.eq(price != null, Material::getPrice, price);
-            lqw.eq(volume != null,Material::getVolume,volume);
+            lqw.eq(mid != null,Location::getLocId,mid);
+            lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),Location::getName,name);
+            lqw.eq(xpos != null ,Location::getXpos,xpos);
+            lqw.eq(ypos != null, Location::getYpos, ypos);
+            lqw.eq(type != null,Location::getType,type);
 
-            /*
             IPage iPage = this.page(page, lqw);
             return Result.success(iPage.getRecords(),iPage.getTotal());
-            */
-            return Result.fail("TEST-LocationService");
         }catch (Exception e){
-            System.out.println("MaterialService.listByPage:" + e);
-            return Result.fail(e.toString());
+            if (e instanceof ServiceException) throw new RequestExpcetion(Constants.CODE_401,e.getMessage());
+            else throw new ServiceException(Constants.CODE_500,"LocationService分页请求异常");
         }
     }
 

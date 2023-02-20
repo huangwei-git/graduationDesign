@@ -21,27 +21,30 @@ public class Result {
     }
 
     public static Result fail() {
-        return result(400, "失败", 0, null);
+        return result(Constants.CODE_400, "失败", 0, null);
     }
 
     public static Result fail(String msg) {
-        return result(400, msg, 0, null);
+        return result(Constants.CODE_400, msg, 0, null);
     }
 
     public static Result success() {
-        return result(200, "成功", 0, null);
+        return result(Constants.CODE_200, "成功", 0, null);
     }
 
-    public static Result success(Object data) {return result(200, "成功", 0, data);}
+    public static Result success(Object data) {return result(Constants.CODE_200, "成功", 0, data);}
 
-    public static Result success(String msg,Object data) {return result(200, msg, 0, data);}
+    public static Result success(String msg,Object data) {return result(Constants.CODE_200, msg, 0, data);}
 
     public static Result success(Object data,long total) {
-        return result(200, "成功", total, data);
+        return result(Constants.CODE_200, "成功", total, data);
     }
 
-    public static Result success(String msg,Object data,long total) {return result(200, msg, total, data);}
+    public static Result success(String msg,Object data,long total) {return result(Constants.CODE_200, msg, total, data);}
 
-    public static Result error(String msg){return result(500,msg,0,null);}
+    public static Result error(int code,String msg){return result(code,msg,0,null);}
 
+    public static Result serviceError(String msg){return result(Constants.CODE_500,msg,0,null);}
+
+    public static Result requestError(String msg){return result(Constants.CODE_401,msg,0,null);}
 }

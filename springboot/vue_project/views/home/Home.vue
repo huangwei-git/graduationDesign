@@ -12,7 +12,9 @@
 
         <el-main>
           <!--<Main/>-->
-          <MaterialMain/>
+          <!--<MaterialMain/>-->
+          <!--<LocationInfo/>-->
+          <MaterfialStore/>
         </el-main>
       </el-container>
     </el-container>
@@ -24,6 +26,9 @@ import Aside from "./Aside.vue"
 import Header from "./Header.vue"
 import Main from "./Main.vue"
 import MaterialMain from '../material/materialInfo.vue'
+import LocationInfo from "../inventory/LocationInfo";
+import MaterialStore from "../material/MaterialStore";
+import MaterfialStore from "../material/MaterialStore";
 
 export default {
   name: "Home",
@@ -36,6 +41,8 @@ export default {
 
   },
   components:{
+    MaterfialStore,
+    LocationInfo,
     Aside,
     Header,
     Main,

@@ -1,7 +1,7 @@
 <template>
   <div id="root">
     <!-- 搜索栏 -->
-    <div style="margin-bottom: 10px;display: flex;align-items:center;justify-content:space-between;flex-wrap: wrap;">
+    <div style="margin-bottom: 10px;">
       <el-date-picker
           v-model="date"
           :editable="false"
@@ -20,10 +20,10 @@
                 :clearable="true"
                 :suffix-icon="inputIconClass"
                 v-model="input"
-                style="width: 260px"
+                style="width: 280px"
                 class="sl-no input-with-select"
                 @keyup.enter.native="search">
-        <el-select class="sl-no" style="width: 80px"  @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
+        <el-select class="sl-no" style="width: 100px"  @change="getChangeValue" v-model="select" slot="prepend" placeholder="请选择">
           <el-option label="姓名" :value="1"></el-option>
           <el-option label="工号" :value="2"></el-option>
         </el-select>
@@ -88,12 +88,10 @@
         <el-option label="管理员" value="0"></el-option>
         <el-option label="运输员" value="1"></el-option>
       </el-select>
-      <div>
-        <el-button-group>
-          <el-button icon="el-icon-search" type="primary" @click="search">搜索</el-button>
-          <el-button icon="el-icon-refresh" type="primary" @click="resetSearch" style="margin-left: 5px">重置</el-button>
-        </el-button-group>
-      </div>
+
+      <el-button icon="el-icon-search" type="primary" @click="search" style="margin-left: 5px">搜索</el-button>
+      <el-button icon="el-icon-refresh" type="primary" @click="resetSearch" style="margin-left: 5px">重置</el-button>
+
     </div>
 
     <div >
@@ -256,7 +254,7 @@
         </el-form-item>
         <el-form-item v-model="rules.phone" label="手机" prop="phone">
           <el-col :span="20">
-            <el-input v-model="form.phone"></el-input>
+            <el-input v-model="form.phone" maxlength="11"></el-input>
           </el-col>
         </el-form-item>
         <el-form-item
@@ -488,26 +486,30 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
+        this.$refs.addForm.validate(valid => {
+          if(valid){
+            this.$axios.put(this.$httpUrl+'/user',this.form)
+                .then(res => res.data)
+                .then(res => {
+                  if(res.code == 200){
+                    this.$notify({
+                      title: '成功',
+                      message: '添加成功',
+                      type: 'success'
+                    });
+                  }else{
+                    this.$notify.error({
+                      title: '错误',
+                      message: '添加失败'
+                    });
+                  }
+                })
+          }
+        })
         if(this.form.job == '管理员'){
           this.form.job = 0;
           this.form.locSendId = 0;
         }else this.form.job  = 1;
-        this.$axios.put(this.$httpUrl+'/user',this.form)
-            .then(res => res.data)
-            .then(res => {
-              if(res.code == 200){
-                this.$notify({
-                  title: '成功',
-                  message: '添加成功',
-                  type: 'success'
-                });
-              }else{
-                this.$notify.error({
-                  title: '错误',
-                  message: '添加失败'
-                });
-              }
-            })
       }).then(() => {
         this.loadPost();
         this.centerDialogVisible = false;

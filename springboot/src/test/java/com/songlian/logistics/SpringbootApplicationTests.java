@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
-import com.songlian.logistics.pojo.Account;
+import com.songlian.logistics.dao.MaterialDao;
 import com.songlian.logistics.pojo.User;
 import com.songlian.logistics.service.AccountService;
+import com.songlian.logistics.service.MaterialService;
 import com.songlian.logistics.service.UserService;
-import com.songlian.logistics.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,10 @@ class SpringbootApplicationTests {
     private UserService userService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private MaterialService materialService;
+    @Autowired
+    private MaterialDao materialDao;
 
     @Test
     void contextLoads() {
@@ -54,23 +58,8 @@ class SpringbootApplicationTests {
 
     @Test
     public void TestJoin(){
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper();
-        Page page = new Page();
-        page.setCurrent(1);
-        page.setSize(20L);
-        Date date = null;
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        try {
-            date = format.parse("2023-02-19 00:00");
-            System.out.println(date);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        lqw.lt(User::getDateOfEntry, "2023-02-19T00:00:00");
-        IPage iPage = userService.page(page,lqw);
-        iPage.getRecords().forEach(item -> {
-            System.out.println(item);
-        });
+        //System.out.println(materialDao.getOne());
+        System.out.println(materialDao.getMaterialCount());
     }
 
     @Test

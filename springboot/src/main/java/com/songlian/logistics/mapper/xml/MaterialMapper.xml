@@ -2,7 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.songlian.logistics.dao.MaterialDao">
 
-    <select id="genPage" resultType="com.songlian.logistics.pojo.Material">
-        select * from user ${ew.customSqlSegment};
+    <resultMap id="materialCount" type="com.songlian.logistics.pojo.Material">
+        <id property="materialId" column="materialId"></id>
+        <result property="name" column="name"></result>
+    </resultMap>
+
+    <select id="getMaterialCount" resultType="hashmap">
+        SELECT
+            mat.material_id as materialId,
+            mat.`name` as materialName,
+            SUM(inv.amount) as materialCount
+        FROM `inventory` inv
+                 LEFT JOIN  `material` mat
+                            ON inv.material_id=mat.material_id
+        WHERE inv.deleted=0
+        GROUP BY(inv.material_id);
     </select>
+
+    <!--<select id="getOne" resultType="com.songlian.logistics.pojo.Material">-->
+    <!--    select * from material where materialiD=1;-->
+    <!--</select>-->
 </mapper>

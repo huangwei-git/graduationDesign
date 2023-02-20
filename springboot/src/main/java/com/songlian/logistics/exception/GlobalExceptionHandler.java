@@ -14,6 +14,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
     public Result handler(ServiceException se){
-        return Result.error(se.getMessage());
+        return Result.serviceError(se.getMessage());
     }
 }
