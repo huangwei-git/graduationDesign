@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ public class UserController {
     // 修改
     @PutMapping
     public Result modify(@RequestBody User user){
+        System.out.println("user = " + user);
         try {
             userService.updateById(user);
             return Result.success();
@@ -98,6 +100,27 @@ public class UserController {
             System.out.println("用户删除失败！" + e.getStackTrace());
             return Result.fail();
         }
+    }
+
+    @GetMapping("/getCountData")
+    public Result userCountData(){
+        return userService.userCountData();
+    }
+
+    @GetMapping("/getCountSexRate")
+    public Result sexCountData(){
+        return userService.userSexCount();
+    }
+
+    @GetMapping("getMonthData")
+    public Result getMonthData(){
+        int months[] = new int[12];
+        userService.list().forEach(user->{
+            LocalDateTime date = user.getDateOfEntry();
+            int x = date.getMonth().getValue();
+            months[x - 1]++;
+        });
+        return Result.success(months);
     }
 }
 

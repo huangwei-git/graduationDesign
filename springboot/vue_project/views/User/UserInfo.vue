@@ -246,7 +246,7 @@
           @current-change="handleCurrentChange"
           :current-page.sync="pageData.pageNum"
           :page-size="pageData.pageSize"
-          :page-sizes="[10,20,20,30,40,50,100]"
+          :page-sizes="[10,20,30,40,50,100]"
           layout="total,sizes,prev, pager, next, jumper"
           :total="pageData.totalPage"
           :hide-on-single-page="false">
@@ -453,7 +453,6 @@ export default {
       this.form.locSendId = row.locSendId == '*'?this.defaultLocation:row.locSendId;
       this.form.state = row.state;
       if(this.form.job == '管理员') this.form.locSendId = this.defaultLocation;
-      console.log(this.form);
       this.centerDialogVisible = true;
     },
     // 新增用户
@@ -476,6 +475,9 @@ export default {
                   message: '添加成功',
                   type: 'success'
                 });
+                setTimeout(()=>{
+                  this.loadPost();
+                },500);
               } else {
                 this.$notify.error({
                   title: '错误',
@@ -483,8 +485,7 @@ export default {
                 });
               }
             })
-      }).then(() => {
-        this.loadPost();
+      }).then(() => {;
         this.centerDialogVisible = false;
       }).catch(() => {
         this.$message({
@@ -503,6 +504,8 @@ export default {
       }).then(()=>{
         this.$refs.addForm.validate(valid => {
           if(valid){
+            if(this.form.job == "运输员") this.form.job = 1;
+            else this.form.job = 0;
             this.$axios.put(this.$httpUrl+'/user',this.form)
                 .then(res => res.data)
                 .then(res => {
@@ -512,6 +515,9 @@ export default {
                       message: '添加成功',
                       type: 'success'
                     });
+                    setTimeout(()=>{
+                      this.loadPost();
+                    },500)
                   }else{
                     this.$notify.error({
                       title: '错误',
@@ -526,7 +532,6 @@ export default {
           this.form.locSendId = 0;
         }else this.form.job  = 1;
       }).then(() => {
-        this.loadPost();
         this.centerDialogVisible = false;
         //this.resetForm();
       }).catch(() => {
@@ -550,7 +555,10 @@ export default {
                 this.$notify.success({
                   title:"成功！",
                   message:`员工"${this.clickedRow.name}"已被删除`,
-                })
+                });
+                setTimeout(()=>{
+                  this.loadPost();
+                },500);
               }else {
                 this.$notify.error({
                   title:"失败！",
@@ -558,8 +566,6 @@ export default {
                 })
               }
             })
-      }).then(() => {
-        this.loadPost();
       }).catch(() => {
         this.$notify.info({
           type: 'info',
@@ -579,11 +585,9 @@ export default {
     },
     saveOrUpdate(){
       if(this.form.uid == ''){
-        console.log(1)
         this.saveForm();
       }else{
-        console.log(2)
-        this.updateForm()
+        this.updateForm();
       }
     },
     //====文件导入成功====
@@ -631,8 +635,6 @@ export default {
           this.pageData.params.startTime = '';
           this.pageData.params.endTime = '';
         }
-      console.log(this.pageData.params.startTime)
-      console.log(this.pageData.params.endTime)
     },
     handleSelectionChange(val) {
       if(val.length) this.handleDisable = false;
@@ -650,15 +652,6 @@ export default {
           title: '删除失败',
           message: '权限不足'
         });
-        //console.log("需要删除：")
-        //this.currentSelected.forEach(item => {
-        //  console.log(item.id,item.date,item.name,item)
-        //})
-        //this.$notify.success({
-        //  title:"删除成功！",
-        //  message:"删除"+this.currentSelected.length+"条记录",
-        //})
-        //console.log("共"+this.currentSelected.length+"个")
       }).catch(() => {
         this.$notify.info({
           type: 'info',
@@ -759,7 +752,7 @@ export default {
     })
   },
   watch:{
-    centerDialogVisible:{
+    isClickEditBtn:{
       handler(nval,oval){
         if(nval == false)
           this.resetForm();

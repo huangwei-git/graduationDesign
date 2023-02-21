@@ -6,6 +6,7 @@ import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.InventoryDao;
 import com.songlian.logistics.dao.LocationDao;
 import com.songlian.logistics.dao.MaterialDao;
+import com.songlian.logistics.dao.UserDao;
 import com.songlian.logistics.pojo.Inventory;
 import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.pojo.Material;
@@ -15,9 +16,12 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @SpringBootTest
 @MapperScan("com.songlian.logistics.dao")
@@ -39,10 +43,15 @@ class SpringbootApplicationTests {
     private MaterialDao materialDao;
 
     @Autowired
+    private UserDao userDao;
+
+    @Autowired
     private LocationDao locationDao;
 
     @Autowired
     private InventoryDao inventoryDao;
+
+    public static int i = 0;
 
     @Test
     void contextLoads() {
@@ -92,12 +101,7 @@ class SpringbootApplicationTests {
     }
 
     @Test
-    public void testAccountLogin(){
-        List<Map> list = inventoryDao.getStoreInfo(null, null, 0, 5);
-        list.forEach(item->{
-            System.out.println(item);
-        });
-        //materialDao.getMaterialCount(null,null);
+    public void testUpdateTime(){
     }
 
 }

@@ -7,8 +7,6 @@ import com.songlian.logistics.pojo.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * <p>
@@ -25,4 +23,8 @@ public interface UserService extends IService<User> {
     public void exportData(HttpServletResponse response) throws Exception;
 
     public Result importData(MultipartFile file) throws Exception;
+
+    public Result userCountData();
+
+    public Result userSexCount();
 }

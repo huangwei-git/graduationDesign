@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -92,6 +93,9 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialDao, Material> impl
 
     @Override
     public Result materialCount(QueryPageParam query) {
+        Integer pageNum = query.getPageNum();
+        Integer pageSize = query.getPageSize();
+
         String name = (String) query.getParams().get("name");
         name = name.trim();
         if(StringUtils.isBlank(name) && name.equals("null")) name=null;
@@ -100,8 +104,23 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialDao, Material> impl
         if (mid != null && mid == -1) return Result.fail("materialId参数错误");
 
         if(name!=null) name = "%" + name + "%";
-        List<HashMap> HashMap = materialDao.getMaterialCount(mid,name);
-        return Result.success(HashMap);
+        Integer total = this.list().size();
+        List<HashMap> map = materialDao.getMaterialCount(mid,name,(pageNum- 1)*pageSize,pageSize);
+        return Result.success(map,total);
+    }
+
+    @Override
+    public Result materialCountOfPieCharts(Integer mid, String name) {
+        try {
+            try {
+                List<Map> data = materialDao.getMaterialCountOfBarCharts(null,null);
+                return Result.success(data);
+            }catch (Exception e){
+                return Result.fail("传入参数异常");
+            }
+        }catch (Exception e){
+            return Result.error(Constants.CODE_500,"图形加载时出错");
+        }
     }
 
     private Integer s2i(String field, Integer errValue) {

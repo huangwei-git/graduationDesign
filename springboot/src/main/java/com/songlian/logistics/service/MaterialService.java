@@ -20,4 +20,6 @@ public interface MaterialService extends IService<Material> {
 
     public Result materialCount(QueryPageParam query);
 
+    public Result materialCountOfPieCharts(Integer mid,String name);
+
 }

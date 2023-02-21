@@ -22,6 +22,25 @@
         <if test="name != null">
             and `mat`.name like #{name}
         </if>
+        GROUP BY(inv.material_id)
+        LIMIT #{pageStart} , #{pageSize};
+    </select>
+
+
+    <select id="getMaterialCountOfBarCharts" resultType="hashmap">
+        SELECT
+        mat.`name` as name,
+        SUM(inv.amount) as value
+        FROM `inventory` inv
+        RIGHT OUTER JOIN  `material` mat
+        ON inv.material_id=mat.material_id
+        WHERE inv.deleted=0
+        <if test="mid != null">
+            and `mat`.material_id = #{mid}
+        </if>
+        <if test="name != null">
+            and `mat`.name like #{name}
+        </if>
         GROUP BY(inv.material_id);
     </select>
 

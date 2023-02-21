@@ -25,9 +25,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Result pageList(QueryPageParam query) {
         try {
-            System.out.println(query);
+
             // 获取参数
             long size = (long) query.getPageSize();
             long num = (long) query.getPageNum();
@@ -205,5 +204,38 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         });
         System.out.println(saveNum);
         return Result.success(null,saveNum);
+    }
+
+    @Override
+    public Result userCountData() {
+        LinkedList<Integer> leisure = new LinkedList<>();
+        LinkedList<Integer> work = new LinkedList<>();
+        LinkedList<Integer> rest = new LinkedList<>();
+        LinkedList<String> loc = new LinkedList<>();
+        List<HashMap> list1 = userDao.getNum("leisure");
+        List<HashMap> list2 = userDao.getNum("work");
+        List<HashMap> list3 = userDao.getNum("rest");
+        for(int i = 0;i < list1.size();i++){
+            leisure.addLast(Math.toIntExact((Long) list1.get(i).get("num")));
+            work.addLast(Math.toIntExact((Long) list2.get(i).get("num")));
+            rest.addLast(Math.toIntExact((Long) list3.get(i).get("num")));
+            loc.addLast((String) list1.get(i).get("locName"));
+        }
+        Map<String, Object[]> map = new HashMap<>();
+        map.put("locName",loc.toArray());
+        map.put("leisure",leisure.toArray());
+        map.put("work",work.toArray());
+        map.put("rest",rest.toArray());
+        return Result.success(map);
+    }
+
+    @Override
+    public Result userSexCount() {
+        Integer male = userDao.getSexNum("男");
+        Integer female = userDao.getSexNum("女");
+        Map<String,Integer> map = new HashMap<>();
+        map.put("male",male);
+        map.put("female",female);
+        return Result.success(map);
     }
 }

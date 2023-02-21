@@ -96,7 +96,7 @@ public class MaterialController {
 
     @PostMapping("count")
     public Result listCount(@RequestBody QueryPageParam query) {
-        System.out.println(query);
+
         try {
             return materialService.materialCount(query);
         }catch (Exception e){
@@ -104,5 +104,10 @@ public class MaterialController {
         }
     }
 
+
+    @GetMapping("piecharts")
+    public Result piechartsData(){
+        return materialService.materialCountOfPieCharts(null,null);
+    }
 }
 
