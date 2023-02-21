@@ -1,9 +1,9 @@
 package com.songlian.logistics.controller;
 
 
+import com.songlian.logistics.common.QueryPageParam;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Inventory;
-import com.songlian.logistics.pojo.Inventory;
-import com.songlian.logistics.service.InventoryService;
 import com.songlian.logistics.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -47,16 +47,30 @@ public class InventoryController {
         return inventoryService.save(inventory);
     }
 
+
     // 修改
     @PutMapping
-    public boolean modify(@RequestBody Inventory inventory){
-        return inventoryService.updateById(inventory);
+    public Result modify(@RequestBody Inventory inventory){
+        System.out.println("inventory = " + inventory);
+        try {
+            inventoryService.updateById(inventory);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println("InventoryController modify error," + e);
+            return Result.fail();
+        }
     }
 
     // 删除
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable Integer id){
         return inventoryService.removeById(id);
+    }
+
+    // 仓库存储的物资信息
+    @PostMapping("/storeInfo")
+    public Result getStoreInfo(@RequestBody QueryPageParam query){
+        return inventoryService.getStoreInfo(query);
     }
 }
 

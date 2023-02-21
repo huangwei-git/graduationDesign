@@ -18,4 +18,6 @@ import com.songlian.logistics.pojo.Material;
 public interface MaterialService extends IService<Material> {
     public Result pageList(QueryPageParam query);
 
+    public Result materialCount(QueryPageParam query);
+
 }

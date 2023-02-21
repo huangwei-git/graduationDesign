@@ -1,27 +1,23 @@
 package com.songlian.logistics;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
+import com.songlian.logistics.dao.InventoryDao;
 import com.songlian.logistics.dao.LocationDao;
 import com.songlian.logistics.dao.MaterialDao;
+import com.songlian.logistics.pojo.Inventory;
 import com.songlian.logistics.pojo.Location;
-import com.songlian.logistics.pojo.User;
-import com.songlian.logistics.service.AccountService;
-import com.songlian.logistics.service.MaterialService;
-import com.songlian.logistics.service.UserService;
+import com.songlian.logistics.pojo.Material;
+import com.songlian.logistics.service.*;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 @MapperScan("com.songlian.logistics.dao")
@@ -29,14 +25,24 @@ class SpringbootApplicationTests {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private AccountService accountService;
+
     @Autowired
     private MaterialService materialService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
     @Autowired
     private MaterialDao materialDao;
+
     @Autowired
     private LocationDao locationDao;
+
+    @Autowired
+    private InventoryDao inventoryDao;
 
     @Test
     void contextLoads() {
@@ -62,15 +68,36 @@ class SpringbootApplicationTests {
 
     @Test
     public void TestJoin(){
-        //System.out.println(materialDao.getOne());
-        //System.out.println(materialDao.getMaterialCount());
-        //System.out.println(materialDao.getOne());
-        System.out.println(locationDao.testloc());
+        List<Material> materials = materialService.list();
+
+        LambdaQueryWrapper<Location> lqw1 = new LambdaQueryWrapper();
+        lqw1.eq(Location::getType,0);
+        List<Location> locations = locationDao.selectList(lqw1);
+
+        locations.forEach(location -> {
+            materials.forEach(material -> {
+                LambdaQueryWrapper<Inventory> lqw2 = new LambdaQueryWrapper<>();
+                lqw2.eq(Inventory::getMaterialId,material.getMaterialId());
+                lqw2.eq(Inventory::getLocSendId,location.getLocId());
+                if (inventoryDao.selectList(lqw2).size() == 0) {
+                    Inventory inventory = new Inventory();
+                    inventory.setLocSendId(location.getLocId());
+                    inventory.setMaterialId(material.getMaterialId());
+                    inventory.setAmount(0);
+                    inventoryDao.insert(inventory);
+                    //System.out.println(location.getName() + " ---> "+ material.getName());
+                }
+            });
+        });
     }
 
     @Test
     public void testAccountLogin(){
-            userService.getById(1);
+        List<Map> list = inventoryDao.getStoreInfo(null, null, 0, 5);
+        list.forEach(item->{
+            System.out.println(item);
+        });
+        //materialDao.getMaterialCount(null,null);
     }
 
 }

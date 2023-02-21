@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2023-02-17
  */
 @RestController
-@RequestMapping("/order_form")
+@RequestMapping("/order")
 public class OrderFormController {
     @Autowired
     private OrderFormService orderFormService;

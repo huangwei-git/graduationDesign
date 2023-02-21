@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl extends ServiceImpl<LocationDao, Location> implements LocationService {
     @Override
-    public Result pageList(QueryPageParam query) throws RequestExpcetion {
+    public Result pageList(QueryPageParam query) {
         try {
             System.out.println("query = " + query);
             // 获取分页参数

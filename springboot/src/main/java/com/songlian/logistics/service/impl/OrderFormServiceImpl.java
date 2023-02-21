@@ -35,11 +35,13 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
                 // 排序参数
                 String sortField = (String) query.getParams().get("sortField");
                 String sortDirection = (String) query.getParams().get("sortDirection");
-                // 实例对象参数
-                String name = (String) query.getParams().get("name");
 
-                Integer mid = s2i((String) query.getParams().get("materialId"), -1);
-                if(mid != null && mid == -1) return Result.fail("materialId参数错误");
+                // 实例对象参数
+                Long orderId = s2l((String) query.getParams().get("orderId"), -1l);
+                if(orderId != null && orderId == -1l) return Result.fail("orderId参数错误");
+
+                Integer managerId = s2i((String) query.getParams().get("managerId"), -1);
+                if(managerId != null && managerId == -1) return Result.fail("managerId参数错误");
 
                 Integer price = s2i((String) query.getParams().get("price"), -1);
                 if(price != null && price == -1) return Result.fail("price参数错误");
@@ -72,11 +74,11 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
                         else if(sortField.equals("volume"))lqw.orderByAsc(Material::getVolume);
                     }
                 }
-                lqw.eq(mid != null,Material::getMaterialId,mid);
-                lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),Material::getName,name);
-                lqw.eq(cost != null ,Material::getCost,cost);
-                lqw.eq(price != null, Material::getPrice, price);
-                lqw.eq(volume != null,Material::getVolume,volume);
+                //lqw.eq(mid != null,Material::getMaterialId,mid);
+                //lqw.like(!name.equals("null") && StringUtils.isNoneBlank(name),Material::getName,name);
+                //lqw.eq(cost != null ,Material::getCost,cost);
+                //lqw.eq(price != null, Material::getPrice, price);
+                //lqw.eq(volume != null,Material::getVolume,volume);
 
             /*
             IPage iPage = this.page(page, lqw);
@@ -100,6 +102,19 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
             }
             return res;
         }
+
+        private Long s2l(String field,Long errValue) {
+            Long res = null;
+            if (!field.equals("null") && StringUtils.isNotBlank(field)) {
+                try {
+                    res = Long.parseLong(field);
+                }catch (Exception e){
+                    return errValue;
+                }
+            }
+            return res;
+        }
+
         private Double s2d(String field,Double errValue) {
             Double res = null;
             if (!field.equals("null") && StringUtils.isNotBlank(field)) {

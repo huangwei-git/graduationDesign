@@ -10,12 +10,18 @@
     <select id="getMaterialCount" resultType="hashmap">
         SELECT
             mat.material_id as materialId,
-            mat.`name` as materialName,
-            SUM(inv.amount) as materialCount
+            mat.`name` as name,
+            SUM(inv.amount) as count
         FROM `inventory` inv
-                 LEFT JOIN  `material` mat
+                 RIGHT OUTER JOIN  `material` mat
                             ON inv.material_id=mat.material_id
         WHERE inv.deleted=0
+        <if test="mid != null">
+            and `mat`.material_id = #{mid}
+        </if>
+        <if test="name != null">
+            and `mat`.name like #{name}
+        </if>
         GROUP BY(inv.material_id);
     </select>
 

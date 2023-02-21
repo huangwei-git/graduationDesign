@@ -1,21 +1,35 @@
 package com.songlian.logistics.service.impl;
 
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.UserDao;
+import com.songlian.logistics.exception.RequestExpcetion;
+import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.pojo.User;
+import com.songlian.logistics.service.LocationService;
 import com.songlian.logistics.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.javassist.bytecode.stackmap.BasicBlock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.function.Function;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -30,6 +44,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Resource
     private UserDao userDao;
+    @Autowired
+    private LocationService ls;
+
+    private int saveNum = 0;
 
     @Override
     public Result pageList(QueryPageParam query) {
@@ -109,5 +127,83 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             System.out.println("UserController.listByPage:" + e);
             return Result.fail(e.toString());
         }
+    }
+
+    @Override
+    public void exportData(HttpServletResponse response) throws Exception {
+        // 1. 从数据库中查出所有数据
+        List list = userDao.exportUserInfo();
+
+        // 2. 创建工具类，写出到浏览器
+        // hutool.cn/docs/#/poi/Excel生成-ExcelWriter
+        ExcelWriter excelWriter = ExcelUtil.getWriter(true);
+        // 3. 定义表头映射字段
+        excelWriter.addHeaderAlias("uid","用户ID");
+        excelWriter.addHeaderAlias("name","姓名");
+        excelWriter.addHeaderAlias("sex","性别");
+        excelWriter.addHeaderAlias("email","邮箱");
+        excelWriter.addHeaderAlias("phone","手机号");
+        excelWriter.addHeaderAlias("job","职位");
+        excelWriter.addHeaderAlias("dateOfEntry","入职时间");
+        excelWriter.addHeaderAlias("location","工作地点");
+        excelWriter.addHeaderAlias("state","状态");
+        // 4. 写出list内容到Excel文件使用默认样式，强制输出标题
+        excelWriter.write(list,true);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("员工信息","UTF-8");
+        response.setHeader("Content-Disposition","attachment;filename=" + fileName + ".xlsx");
+
+
+        ServletOutputStream out = response.getOutputStream();
+        excelWriter.flush(out, true);
+        out.close();
+        excelWriter.close();
+    }
+
+    /**
+     * Excel导入数据
+     * @param file
+     * @throws Exception
+     */
+    @Override
+    public Result importData(MultipartFile file) throws Exception {
+        LambdaQueryWrapper<Location> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Location::getType, 0);
+        HashMap<String,Integer> locMapId = new HashMap<>();
+        ls.list(lqw).forEach(loc -> {
+            locMapId.put(loc.getName(),loc.getLocId());
+        });
+        InputStream inputStream = file.getInputStream();
+        ExcelReader reader = ExcelUtil.getReader(inputStream);
+
+        HashMap<String,Object> map = new HashMap();
+
+        List<Map<String, Object>> list = reader.readAll();
+        list.forEach(item -> {
+            User user = new User();
+            try {
+                long phone = (long)item.get("手机号");
+                user.setName((String) item.get("姓名"));
+                user.setSex((String) item.get("性别"));
+                user.setPhone(Long.toString((Long) item.get("手机号")));
+                user.setEmail((String) item.get("邮箱"));
+                String job = (String) item.get("职位");
+                if(job.equals("管理员")) user.setJob(0);
+                else user.setJob(1);
+                if(user.getJob() == 0) user.setLocSendId(0);
+                else{
+                    String locName = (String) item.get("工作地点");
+                    user.setLocSendId(locMapId.get(locName));
+                }
+            }catch (RequestExpcetion e){
+                System.out.println("错辣！");
+                throw e;
+            }
+            System.out.println("user = " + user);
+            if(this.save(user)) saveNum++;
+        });
+        System.out.println(saveNum);
+        return Result.success(null,saveNum);
     }
 }

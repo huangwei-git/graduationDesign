@@ -1,6 +1,8 @@
 package com.songlian.logistics.controller;
 
 
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,7 +13,13 @@ import com.songlian.logistics.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,15 +39,16 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 查询全部
-    @GetMapping
-    public Result list() {
-        List<User> list = userService.list();
+    // 导入
+    @PostMapping("/import")
+    public void importData(MultipartFile file) throws Exception {
+        userService.importData(file);
+    }
 
-        List<User> data = userService.list();
-        Result res = data == null ? Result.success(new ArrayList()) : Result.success(data, data.size());
-        System.out.println(res);
-        return res;
+    // 导出
+    @GetMapping("/export")
+    public void exportData(HttpServletResponse response) throws Exception {
+        userService.exportData(response);
     }
 
     // 根据id查询

@@ -2,4 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.songlian.logistics.dao.InventoryDao">
 
+    <select id="getStoreInfo" resultType="java.util.Map">
+        SELECT
+            inv.`store_id` AS storeId,
+            loc.`loc_id` AS locId,
+            loc.`name` AS inventoryName,
+            mat.`name` AS materialName,
+            mat.`material_id` AS materialId,
+            inv.amount AS amount
+        FROM `inventory` inv
+            LEFT JOIN
+            `location` loc
+                ON
+                    inv.loc_send_id = loc.loc_id
+            LEFT JOIN
+            `material` mat
+                ON
+                    inv.material_id = mat.material_id
+        WHERE
+            1 = 1
+            <if test="inventoryName != null">
+                AND loc.name like #{inventoryName}
+            </if>
+            <if test="materialName != null">
+                AND mat.name like #{materialName}
+            </if>
+        ORDER BY
+            loc.name ASC,inv.amount DESC
+        LIMIT #{pageStart} , #{pageSize};
+    </select>
+
+
 </mapper>

@@ -31,7 +31,7 @@ public interface MaterialDao extends BaseMapper<Material> {
     //        "                            ON inv.material_id=mat.material_id\n" +
     //        "        WHERE inv.deleted=0\n" +
     //        "        GROUP BY(inv.material_id);")
-    public List<HashMap> getMaterialCount();
+    public List<HashMap> getMaterialCount(@Param("mid") Integer mid,@Param("name") String name);
 
     //@Select("select * from material where material_id=1;")
     public Material getOne();

@@ -2,5 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.songlian.logistics.dao.UserDao">
 
-
+<select id="exportUserInfo" resultType="hashmap">
+    SELECT
+        u.uid as uid,
+        u.name as name,
+        u.sex as sex,
+        u.email as email,
+        u.phone as phone,
+        (CASE u.job
+             WHEN 0 THEN
+                 "管理员"
+             ELSE
+                 "运输员"
+            END
+            )job,
+        u.date_of_entry as dateOfEntry,
+        (CASE u.loc_send_id
+             WHEN 0 THEN
+                 "无"
+             ELSE
+                 l.name
+            END
+            )location,
+        (CASE u.state
+             WHEN 'leisure' THEN
+                 "空闲"
+             WHEN 'work' THEN
+                 "工作"
+             ELSE
+                 "休息"
+            END
+            )state
+    FROM
+        `user` u
+            LEFT JOIN
+        `location` l
+        ON
+            u.loc_send_id = l.loc_id
+</select>
 </mapper>

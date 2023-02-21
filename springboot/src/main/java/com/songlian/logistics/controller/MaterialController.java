@@ -8,6 +8,7 @@ import com.songlian.logistics.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -92,5 +93,16 @@ public class MaterialController {
             return Result.serviceError(e.getMessage());
         }
     }
+
+    @PostMapping("count")
+    public Result listCount(@RequestBody QueryPageParam query) {
+        System.out.println(query);
+        try {
+            return materialService.materialCount(query);
+        }catch (Exception e){
+            return Result.fail(e.toString());
+        }
+    }
+
 }
 

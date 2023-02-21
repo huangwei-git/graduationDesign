@@ -10,7 +10,7 @@ public class Main {
         int supplier[] = {30,40,50};
         int demander[] = {16,30,24,50};
 
-        Solution solution = new Solution(supplier, demander, cost,true);
+        TransportionSolution solution = new TransportionSolution(supplier, demander, cost,true);
         solution.Run();
     }
 }

@@ -3,7 +3,7 @@ package com.songlian.TransportionProblem;
 import java.util.LinkedList;
 import java.util.Stack;
 
-class Solution{
+class TransportionSolution {
     // 工厂供应量
     private int supplier[];
     private int numOfSupplier;
@@ -27,15 +27,15 @@ class Solution{
 
 
 
-    public Solution(){}
-    public Solution(int[] a, int[] b, int[][] cost) {
+    public TransportionSolution(){}
+    public TransportionSolution(int[] a, int[] b, int[][] cost) {
         supplier = a;
         this.numOfSupplier = a.length;
         demander = b;
         this.numOfDemander = b.length;
         costTab = cost;
     }
-    public Solution(int[] a, int[] b, int[][] cost,boolean useVogel) {
+    public TransportionSolution(int[] a, int[] b, int[][] cost, boolean useVogel) {
         supplier = a;
         this.numOfSupplier = a.length;
         demander = b;
