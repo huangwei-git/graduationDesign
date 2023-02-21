@@ -137,7 +137,6 @@ export default {
       this.$axios.post(this.$httpUrl+'/inventory/storeInfo',this.pageData)
           .then(res => res.data)
           .then(res => {
-            console.log("res====>",res);
             this.loading = true;
             this.pageData.totalPage = res.total;
             this.dataFormat(res);

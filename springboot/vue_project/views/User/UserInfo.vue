@@ -315,7 +315,7 @@
 <script>
 
 export default {
-  name: "Main",
+  name: "UserInfo",
   methods:{
     //====Axios====
     dataFormat(res){
@@ -688,7 +688,7 @@ export default {
       pageData:{
         pageNum:1,
         totalPage:22,
-        pageSize:20,
+        pageSize:10,
         params:{
           uid:'',
           name:'',

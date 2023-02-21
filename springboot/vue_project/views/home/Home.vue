@@ -25,7 +25,7 @@
 <script>
 import Aside from "./Aside.vue"
 import Header from "./Header.vue"
-import Main from "./Main.vue"
+import Main from "../User/UserInfo.vue"
 import MaterialInfo from '../material/materialInfo.vue'
 import LocationInfo from "../inventory/LocationInfo.vue";
 import MaterialStore from "../material/MaterialCount.vue";

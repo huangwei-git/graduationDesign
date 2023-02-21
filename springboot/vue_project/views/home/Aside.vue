@@ -20,18 +20,19 @@
       <el-menu-item-group>
         <template slot="title">分组一</template>
         <el-menu-item index="/">员工信息</el-menu-item>
+        <el-menu-item index="/userEcharts">图表分析</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-office-building"></i>
-        <span slot="title">坐标信息</span>
+        <span slot="title">仓库信息</span>
       </template>
       <el-menu-item-group>
         <template slot="title">分组一</template>
         <el-menu-item index="locationInfo">坐标管理</el-menu-item>
-        <el-menu-item index="storeInfo">仓库信息</el-menu-item>
+        <el-menu-item index="storeInfo">仓库管理</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
@@ -44,6 +45,7 @@
         <template slot="title">分组1</template>
         <el-menu-item index="/materialInfo">物品信息</el-menu-item>
         <el-menu-item index="/materialCount">数量统计</el-menu-item>
+        <el-menu-item index="/materialEcharts">图表分析</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 

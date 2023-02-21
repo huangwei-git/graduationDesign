@@ -52,7 +52,7 @@
           :default-sort = "{prop: 'mid', order: 'inscending'}"
           :cell-style="{ textAlign: 'center' }"
           :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
-          style="margin-top: 10px;width: 761px;"
+          style="margin-top: 10px;width: 562px;"
           @row-click="recordRowInfo"
       >
 

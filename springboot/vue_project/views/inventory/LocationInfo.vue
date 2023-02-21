@@ -129,11 +129,11 @@
     <el-dialog
         title="地点信息"
         :visible.sync="centerDialogVisible"
-        width="20%"
+        width="420px"
         center>
       <el-form :model="form" :rules="rules" ref="addForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label=地点名称 prop="name">
-          <el-input v-model="form.name"></el-input>
+          <el-input class="dia_ipt" v-model="form.name"></el-input>
         </el-form-item>
 
         <el-form-item label="地点类型" prop="type">
@@ -144,11 +144,11 @@
         </el-form-item>
 
         <el-form-item label="x坐标" prop="xpos">
-          <el-input v-model="form.xpos"></el-input>
+          <el-input class="dia_ipt" v-model="form.xpos"></el-input>
         </el-form-item>
 
         <el-form-item label="y坐标" prop="ypos">
-          <el-input v-model="form.ypos"></el-input>
+          <el-input class="dia_ipt" v-model="form.ypos"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -172,7 +172,6 @@ export default {
       if(res.code == 200){
         this.tableData = res.data;
       }else{
-        console.log(res.msg)
         alert("获取数据失败");
       }
       this.$nextTick(()=>{
@@ -189,7 +188,6 @@ export default {
           })
     },
     search(){
-      console.log("search")
       if(this.searchSelect == 1){
         this.pageData.params.name = this.searchValue;
       }else{
@@ -204,8 +202,7 @@ export default {
       this.pageData.params.xpos = this.searchPos.xpos;
       this.pageData.params.ypos = this.searchPos.ypos;
       this.pageData.params.type = this.searchType;
-      console.log(this.pageData.params);
-      
+
       this.loadPost();
     },
     resetSearch(){
@@ -271,7 +268,6 @@ export default {
                     type: 'success'
                   });
                 } else {
-                  console.log(res.code)
                   if(res.code == 401){
                     this.$notify.error({
                       title:"错误",
@@ -509,6 +505,10 @@ export default {
 
 .search-div > .el-form{
   height: 40px;
+}
+
+.dia_ipt{
+  width:250px;
 }
 
 </style>
