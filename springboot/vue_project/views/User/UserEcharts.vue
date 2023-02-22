@@ -1,59 +1,78 @@
 <template>
   <div id="root">
     <!--row 1-->
-    <el-row :gutter="10">
+    <div style="display: flex;justify-content: space-between">
 
-      <el-col :span="10">
-        <el-card class="box-card">
-          <div v-for="o in 4" :key="o" class="text item">
-            {{'列表内容 ' + o }}
+      <div style="display: inline-block;width: 866px">
+          <el-card class="sl-no" style="height: 233px;">
+            <div slot="header" style="text-align: center">
+              <h1>各工作状态的人数</h1>
+            </div>
+          <div style="display: flex;justify-content: space-between;margin: -20px">
+
+              <el-card class="box-card el-card-state">
+                <div>
+                  <el-tag type="success" effect="dark" class="el-tag-state"> 空闲 </el-tag>
+                </div>
+                <div style="text-align: center">
+                  <span style="font-size: 2em;color: #67c23a"><i class="el-icon-user sl-no"></i> {{leisureNum}}</span>
+                </div>
+              </el-card>
+              <el-card class="box-card el-card-state">
+                <div>
+                  <el-tag type="danger" effect="dark" class="el-tag-state">工作</el-tag>
+                </div>
+                <div style="text-align: center">
+                  <span style="font-size: 2em;color: #f76c6c"><i class="el-icon-user sl-no"></i> {{workNum}}</span>
+                </div>
+              </el-card>
+              <el-card class="box-card el-card-state" style="margin-right: 5px">
+                <div>
+                  <el-tag type="warning" effect="dark" class="el-tag-state">休息</el-tag>
+                </div>
+                <div style="text-align: center">
+                  <span style="font-size: 2em;color: #e6a23c"><i class="el-icon-user sl-no"></i> {{restNum}}</span>
+                </div>
+              </el-card>
+
           </div>
-        </el-card>
-      </el-col>
+          </el-card>
+      </div>
 
-      <el-col :span="7">
-        <el-card class="box-card">
-          <div v-for="o in 4" :key="o" class="text item">
-            {{'列表内容 ' + o }}
+      <div style="display: inline-block;width: 776px">
+        <el-card class="box-card sl-no">
+          <div slot="header" style="text-align: center;">
+            <h1>入职人数</h1>
           </div>
+          <el-carousel :interval="2000" type="card" height="100px" trigger="click">
+            <el-carousel-item
+                v-for="item of monthNum"
+                :key="item.name"
+                style="padding: 10px;text-align: center;border-radius: 5px;"
+                :style="{backgroundColor:color[item.name]}">
+              <h3 style="line-height: 80px;color: white">{{item.name + 1}}月  {{item.value}} 人 <i v-show="monthsMaxNum == item.value" class="el-icon-s-flag" style="color: red"></i></h3>
+            </el-carousel-item>
+          </el-carousel>
         </el-card>
+      </div>
 
-      </el-col>
-
-      <el-col :span="7">
-        <el-card class="box-card">
-          <div v-for="o in 4" :key="o" class="text item">
-            {{'列表内容 ' + o }}
-          </div>
-        </el-card>
-      </el-col>
-
-    </el-row>
-
-    <br>
+    </div>
 
     <!-- row 2-->
-    <el-row :gutter="10">
+    <div style="display: flex;justify-content: space-between;margin-top: 13px">
 
-        <el-col :span="10">
-          <el-card class="box-card">
-            <div id="user-count" style="width: 100%;height: 500px"></div>
+      <div style="width: 866px;display: inline-block">
+          <el-card class="box-card" >
+            <div id="user-count" style="width:100%;height: 573px;"></div>
           </el-card>
-        </el-col>
+      </div>
 
-      <el-col :span="7">
+      <div style="width: 776px;display: inline-block;">
         <el-card class="box-card">
-          <div id="sex-count" style="width: 100%;height: 500px"></div>
+          <div id="month-count" style="width:100%;height: 573px"></div>
         </el-card>
-      </el-col>
-
-      <el-col :span="7">
-        <el-card class="box-card">
-          <div id="month-count" style="width: 100%;height: 500px"></div>
-        </el-card>
-      </el-col>
-
-    </el-row>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -65,29 +84,69 @@ export default {
   name: "UserEcharts",
   data(){
     return{
+      leisureNum:0,
+      workNum:0,
+      restNum:0,
+      monthNum:Array(12).fill('$'),
+      monthsMaxNum:0,
+      color: [
+        '#187a2f',//1
+        '#718933',
+        '#e1c315',
+        '#dd4c51',
+
+        '#0aa3b5',//5
+        '#3ba272',
+        '#e65832',
+        '#da0168',
+
+        '#9a60b4',//9
+        '#da1d23',
+        '#bb764c',
+        '#794752'
+      ],
+      cardIndex:0,
     }
   },
   mounted() {
+
+    // =========各部门人数=========
     var userChartDom = document.getElementById('user-count');
     var userChart = echarts.init(userChartDom);
     var userCount;
 
     userCount = {
+      title: {
+        text: '各运输中心的人数',
+        left: 'center',
+        top: 0,
+        textStyle: {
+        }
+      },
+      color: [
+        '#67c23a',
+        '#f76c6c',
+        '#e6a23c',
+      ],
       toolbox: {
         show: true,
         feature: {
+          dataView: { show: true, readOnly: true },
           magicType: { type: ['line', 'bar'] },
+          restore:{},
           saveAsImage: {}
         }
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          // Use axis to trigger tooltip
-          type: 'line' // 'shadow' as default; can also be 'line' or 'shadow'
-        }
+          type: 'line',
+        },
       },
-      legend: {},
+      legend: {
+        orient:"vertical",
+        left: 'left'
+      },
       grid: {
         left: '3%',
         right: '4%',
@@ -103,11 +162,16 @@ export default {
       },
       series: [
         {
-          name: '',
+          name: 'Leisure',
           type: 'bar',
           stack: 'total',
           label: {
-            show: true
+            show: true,
+            textStyle:{
+              fontWeight:300,
+              fontSize:15,
+              color:'white',
+            },
           },
           emphasis: {
             focus: 'series'
@@ -115,11 +179,16 @@ export default {
           data: []
         },
         {
-          name: '',
+          name: 'Work',
           type: 'bar',
           stack: 'total',
           label: {
-            show: true
+            show: true,
+            textStyle:{
+              fontWeight:300,
+              fontSize:15,
+              color:'white',
+            },
           },
           emphasis: {
             focus: 'series'
@@ -127,11 +196,16 @@ export default {
           data: []
         },
         {
-          name: '',
+          name: 'Rest',
           type: 'bar',
           stack: 'total',
           label: {
-            show: true
+            show: true,
+            textStyle:{
+              fontWeight:300,
+              fontSize:15,
+              color:'white',
+            },
           },
           emphasis: {
             focus: 'series'
@@ -145,20 +219,27 @@ export default {
         .then(res => res.data)
         .then(res => {
           userCount.yAxis.data = res.data["locName"];
-          userCount.series[0].name = 'Leisure';
+          userCount.series[0].name = '空闲';
           userCount.series[0].data = res.data["leisure"];
 
-          userCount.series[1].name = 'Work';
+          userCount.series[1].name = '工作';
           userCount.series[1].data = res.data["work"];
 
-          userCount.series[2].name = 'Rest';
+          userCount.series[2].name = '休息';
           userCount.series[2].data = res.data["rest"];
+
+          for(let i = 0;i < res.data["leisure"].length;i++){
+            this.leisureNum += res.data["leisure"][i];
+            this.workNum += res.data["work"][i];
+            this.restNum += res.data["rest"][i];
+          }
 
         }).then(()=>{
           userCount && userChart.setOption(userCount);
     });
 
-    //==================
+    //========男女比例==========
+    /*
     sexCount = {
       title: {
         text: '男女员工性别比例',
@@ -244,60 +325,109 @@ export default {
         }).then(()=>{
           sexCount && sexChart.setOption(sexCount);
     });
-    //==================
+    */
+    //=========各月份入职人数=========
 
     var monthChartDom = document.getElementById('month-count');
     var monthChart = echarts.init(monthChartDom);
     var monthsData;
 
+    /*折线图*/
+    //monthsData = {
+    //  toolbox: {
+    //    show: true,
+    //    feature: {
+    //      magicType: { type: ['line', 'bar'] },
+    //      saveAsImage: {}
+    //    }
+    //  },
+    //  title: {
+    //    text: '各月份员工入职人数',
+    //    subtext: '2022-01-01 至 2023-02-28',
+    //    left: 'center'
+    //  },
+    //  tooltip:{
+    //    trigger:'item',
+    //  },
+    //  xAxis: {
+    //    type: 'category',
+    //    boundaryGap: false,
+    //    data: ['1', '2', '3', '4', '5', '6', '7','8','9','10','11','12']
+    //  },
+    //  legend:{
+    //    orient: 'vertical',
+    //    left:'left'
+    //  },
+    //  yAxis: {
+    //    type: 'value'
+    //  },
+    //  series: [
+    //    {
+    //      data: '',
+    //      type: 'line',
+    //      markPoint: {
+    //        data: [
+    //          { type: 'max', name: 'Max' },
+    //          { type: 'min', name: 'Min' }
+    //        ]
+    //      },
+    //      markLine: {
+    //        data: [{ type: 'average', name: 'Avg' }]
+    //      }
+    //    }
+    //  ]
+    //};
+
     monthsData = {
+      title: {
+        text: '不同月份的入职人数',
+        left: 'center',
+        top: 0,
+        textStyle: {
+        }
+      },
+      color: this.color,
+      tooltip: {
+        trigger: 'item',
+      },
+      legend: {
+        orient:"vertical",
+        left: 'left'
+      },
       toolbox: {
         show: true,
         feature: {
-          magicType: { type: ['line', 'bar'] },
+          dataView: { show: true, readOnly: true },
+          restore:{},
           saveAsImage: {}
         }
       },
-      title: {
-        text: '各月份员工入职人数',
-        subtext: '2022-01-01 至 2023-02-28',
-        left: 'center'
-      },
-      tooltip:{
-        trigger:'item',
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: ['1', '2', '3', '4', '5', '6', '7','8','9','10','11','12']
-      },
-      legend:{
-        orient: 'vertical',
-        left:'left'
-      },
-      yAxis: {
-        type: 'value'
-      },
       series: [
         {
-          data: '',
-          type: 'line',
-          markPoint: {
-            data: [
-              { type: 'max', name: 'Max' },
-              { type: 'min', name: 'Min' }
-            ]
+          name: '入职人数',
+          type: 'pie',
+          radius: [50, 250],
+          center: ['57%', '55%'],
+          roseType: 'area',
+          itemStyle: {
+            borderRadius: 5
           },
-          markLine: {
-            data: [{ type: 'average', name: 'Avg' }]
-          }
+          data: [
+          ],
         }
       ]
     };
+
+
     this.$axios.get(this.$httpUrl + "/user/getMonthData")
         .then(res => res.data)
         .then(res => {
-          monthsData.series[0].data = res.data;
+          //monthsData.series[0].data = res.data;
+          for(let i = 0;i < 12;i++){
+            monthsData.series[0].data[i] = {value:res.data[i],name:`${i+1}月`}
+            this.monthNum[i] = {value:res.data[i],name:i}
+            if(res.data[i] > this.monthsMaxNum) this.monthsMaxNum = res.data[i];
+          }
         }).then(() => {
           monthsData && monthChart.setOption(monthsData);
     });
@@ -310,5 +440,23 @@ export default {
 <style scoped>
 .chart-div > div{
   display: inline-block;
+}
+
+.el-tag-state{
+  font-size: 1.2em;
+  padding:0px 5px;
+  margin-bottom: 15px;
+}
+
+.el-card-state{
+  display: inline-block;
+  width: 33%;
+  height: 160px;
+  margin: 5px 0px;
+  margin-left: 5px;
+}
+
+.el-carousel__item:nth-child(1+13n) {
+  background-color: red;
 }
 </style>

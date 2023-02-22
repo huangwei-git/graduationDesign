@@ -18,7 +18,6 @@
         <span slot="title">员工管理</span>
       </template>
       <el-menu-item-group>
-        <template slot="title">分组一</template>
         <el-menu-item index="/">员工信息</el-menu-item>
         <el-menu-item index="/userEcharts">图表分析</el-menu-item>
       </el-menu-item-group>
@@ -30,7 +29,6 @@
         <span slot="title">仓库信息</span>
       </template>
       <el-menu-item-group>
-        <template slot="title">分组一</template>
         <el-menu-item index="locationInfo">坐标管理</el-menu-item>
         <el-menu-item index="storeInfo">仓库管理</el-menu-item>
       </el-menu-item-group>
@@ -42,7 +40,6 @@
         <span slot="title">物品信息</span>
       </template>
       <el-menu-item-group>
-        <template slot="title">分组1</template>
         <el-menu-item index="/materialInfo">物品信息</el-menu-item>
         <el-menu-item index="/materialCount">数量统计</el-menu-item>
         <el-menu-item index="/materialEcharts">图表分析</el-menu-item>
@@ -55,9 +52,7 @@
         <span slot="title">订单管理</span>
       </template>
       <el-menu-item-group>
-        <template slot="title">分组一</template>
-        <el-menu-item index="3-1">选项1</el-menu-item>
-        <el-menu-item index="3-2">选项2</el-menu-item>
+        <el-menu-item index="/addOrder">添加订单</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
@@ -67,7 +62,6 @@
         <span slot="title">运输计划</span>
       </template>
       <el-menu-item-group>
-        <template slot="title">分组一</template>
         <el-menu-item index="3-1">选项1</el-menu-item>
         <el-menu-item index="3-2">选项2</el-menu-item>
       </el-menu-item-group>

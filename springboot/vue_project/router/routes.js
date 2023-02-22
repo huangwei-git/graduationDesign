@@ -9,6 +9,7 @@ import MaterialCount from "../views/material/MaterialCount.vue"
 import MaterialInfo from "../views/material/materialInfo.vue"
 import StoreInfo from "../views/inventory/StoreInfo";
 import MaterialEcharts from "../views/material/MaterialEcharts";
+import AddOrder from "../views/order/AddOrder";
 
 export default new VueRouter({
     routes:[
@@ -47,6 +48,10 @@ export default new VueRouter({
                     path:'materialEcharts',
                     component:MaterialEcharts
                 },
+                {
+                    path:'addOrder',
+                    component:AddOrder
+                }
             ]
         },
         {

@@ -42,6 +42,14 @@ export default {
       visible:false,
     }
   },
+  beforeMount() {
+    let username = this.username = sessionStorage.getItem("username");
+    if(username == null){
+      alert("请先登陆!");
+      this.$router.push("/login");
+    }else
+      JSON.parse(sessionStorage.getItem("username"));
+  },
   methods:{
     collapse(){
       this.isCollapse = !this.isCollapse;
@@ -78,11 +86,8 @@ export default {
         });
       });
     }
-  },
-  beforeMount() {
-    this.username = sessionStorage.getItem("username")?
-        JSON.parse(sessionStorage.getItem("username")):{};
-    console.log(this.username);
+  },beforeDestroy() {
+    sessionStorage.removeItem("username");
   }
 }
 </script>

@@ -201,7 +201,7 @@
         <template slot-scope="scope">
           <el-tag
               :type="scope.row.state === 'leisure' ? 'success' :
-                     scope.row.state === 'work'? 'danger' : 'info'"
+                     scope.row.state === 'work'? 'danger' : 'warning'"
               disable-transitions
               effect="plain"
               style="width: 60px;font-weight: bold;"

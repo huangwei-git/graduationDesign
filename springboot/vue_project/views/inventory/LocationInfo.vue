@@ -88,8 +88,8 @@
         <el-table-column prop="name"  label="地点名称" width="100px"></el-table-column>
         <el-table-column  label="地点类型" width="120px">
           <template slot-scope="scope">
-            <el-tag v-show="scope.row.type == 0" type="danger">运输中心</el-tag>
-            <el-tag v-show="scope.row.type == 1" type="warning">需求地</el-tag>
+            <el-tag v-if="scope.row.type == 0" type="danger" effect="plain" >运输中心</el-tag>
+            <el-tag v-if="scope.row.type == 1" type="warning" effect="plain" >需求地</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="坐标" width="100px">
