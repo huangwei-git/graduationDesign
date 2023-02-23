@@ -2,7 +2,6 @@ package com.songlian.logistics.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.songlian.logistics.common.Constants;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
@@ -31,9 +30,9 @@ public class LocationController {
     
     // 查询全部
     @GetMapping
-    public List<Location> list() {
+    public Result list() {
         List<Location> list = locationService.list();
-        return list;
+        return Result.success(list,list.size());
     }
 
     // 根据id查询

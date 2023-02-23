@@ -1,9 +1,13 @@
-package com.songlian.TransportionProblem;
+package com.songlian.logistics.calculate.Transport;
+
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
-class TransportionSolution {
+@Component
+public class TransportionSolution {
     // 工厂供应量
     private int supplier[];
     private int numOfSupplier;
@@ -24,8 +28,17 @@ class TransportionSolution {
     private boolean useVogel = false;
     // 是否产销不平衡
     private boolean unBalance = false;
+    // 是否打印过程
+    private boolean openProcessPrint = false;
+    // 方案总费用
+    private int total = 0;
 
-
+    // 记录每次的方案
+    private List<int[][]> recordPlan = new LinkedList<>();
+    private List<Integer> recordTotal = new LinkedList<>();
+    private List<int[][]> recordCheckField = new LinkedList<>();
+    private List<List<Point>> recordLoop = new LinkedList<>();
+    private List<Integer> recordAdjust = new LinkedList<>();
 
     public TransportionSolution(){}
     public TransportionSolution(int[] a, int[] b, int[][] cost) {
@@ -57,13 +70,18 @@ class TransportionSolution {
             // 2.2 通过入基变量求闭合回路
             LinkedList<Point> path = getclosedLoop(point.x, point.y);
             adjustClosedLoop(path,point);
-            System.out.println("-----------------------");
+            if(this.openProcessPrint) System.out.println("-----------------------");
         }
 
+        this.total = calcTotal();
         /*==========输出最终方案/*==========*/
-        System.out.println("==========最终方案为==========");
-        printArray(planTab);
-        System.out.println("需要的价格为：" + getTotal());
+        if(this.openProcessPrint){
+            System.out.println("==========最终方案为==========");
+            printArray(planTab);
+            System.out.println("需要的价格为：" + this.total);
+        }
+        recordPlan.add(planTab);
+        recordTotal.add(this.total);
     }
 
     // 0. 产销平衡化
@@ -213,9 +231,15 @@ class TransportionSolution {
             }
         }
         if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = 0;
-        System.out.println("==========初始解决方案==========");
-        printArray(planTab);
+
+        if(this.openProcessPrint){
+            System.out.println("==========初始解决方案==========");
+            printArray(planTab);
+        }
+        recordPlan.add(this.planTab);
+        recordTotal.add(this.calcTotal());
     }
+
     //      2.2 方法二： 最小元素法
     private void getInitialPlanByMinElement(){
         int temp_A[] = supplier.clone();
@@ -283,8 +307,12 @@ class TransportionSolution {
         }
         if(unBalance) for(int i = 0;i < numOfSupplier;i++) costTab[i][numOfDemander - 1] = 0;
 
-        System.out.println("==========初始解决方案==========");
-        printArray(planTab);
+        if(this.openProcessPrint){
+            System.out.println("==========初始解决方案==========");
+            printArray(planTab);
+        }
+        this.recordPlan.add(this.planTab);
+        this.recordTotal.add(this.calcTotal());
     }
 
     // 3. 计算位势
@@ -339,11 +367,13 @@ class TransportionSolution {
                 stack = rowStack;
             }
         }
-        System.out.println("位势：");
-        for (int i = 0; i < numOfSupplier; i++) System.out.print(rowGeopotential[i] + " ");
-        System.out.println();
-        for(int i = 0; i < numOfDemander; i++) System.out.print(colGeopotential[i] + " ");
-        System.out.println();
+        if(this.openProcessPrint){
+            System.out.print("列位势：");
+            for (int i = 0; i < numOfSupplier; i++) System.out.print(rowGeopotential[i] + " ");
+            System.out.print("行位势：");
+            for(int i = 0; i < numOfDemander; i++) System.out.print(colGeopotential[i] + " ");
+            System.out.println();
+        }
     }
 
     // 4. 计算检验数：获得入基变量的point对象
@@ -367,8 +397,11 @@ class TransportionSolution {
         }
 
         /*==========输出检验数==========*/
-        System.out.println("检验数:");
-        printArray(check);
+        if (this.openProcessPrint){
+            System.out.println("检验数:");
+            printArray(check);
+        }
+        this.recordCheckField.add(check);
 
         if(minThet == 0) return null;
         else return point;
@@ -401,11 +434,11 @@ class TransportionSolution {
             path = findClosedLoop(1, S, T, S, T, visisted,true);
 
         /*==========输出闭合回路路径/*==========*/
-        System.out.println("所得闭合回路为：");
-        //path.forEach(item -> {
-        //    System.out.println(item);
-        //});
-        printLoop(path);
+        if (this.openProcessPrint){
+            System.out.println("所得闭合回路为：");
+            printLoop(path);
+        }
+        this.recordLoop.add(path);
 
         return path;
     }
@@ -476,7 +509,7 @@ class TransportionSolution {
         target[tmpPoint.x][tmpPoint.y] = 0;
         target[point.x][point.y] = 1;
         // 计算原总价
-        int oldTotal = getTotal();
+        int oldTotal = calcTotal();
         // 2. 修改回路上的分配方案
         int direction = 1;
         if(index == 0) direction = -1;
@@ -485,17 +518,21 @@ class TransportionSolution {
             direction *= -1;
         }
         // 计算修改后的总价
-        int newTotal = getTotal();
+        int newTotal = calcTotal();
         // 输出调整后的方案：
-        System.out.println("调整量：" + delta+"\n调整后的方案");
-        printArray(planTab);
-        System.out.println("调整前运费：" + oldTotal);
-        System.out.println("调整后运费：" + newTotal);
-        System.out.println("节省运费：" + (oldTotal - newTotal));
+        if(this.openProcessPrint){
+            System.out.println("调整量：" + delta+"\n调整后的方案");
+            printArray(planTab);
+            System.out.println("调整前运费：" + oldTotal);
+            System.out.println("调整后运费：" + newTotal);
+            System.out.println("节省运费：" + (oldTotal - newTotal));
+        }
+        this.recordPlan.add(this.planTab);
+        this.recordTotal.add(newTotal);
     }
 
     // 7. 计算总运费
-    private int getTotal() {
+    private int calcTotal() {
         int sum = 0;
         for (int i = 0; i < numOfSupplier; i++) {
             for (int j = 0; j < numOfDemander; j++) {
@@ -507,10 +544,14 @@ class TransportionSolution {
 
     // 打印回路
     private void printLoop(LinkedList<Point> path){
+        int loop[][] = new int[numOfSupplier][numOfDemander];
         for(int i = 0; i < numOfSupplier; i++){
             for(int j = 0; j < numOfDemander; j++){
-                if(path.contains(new Point(i,j))) System.out.print("* ");
-                else System.out.print("- ");
+                if (path.contains(new Point(i, j))) {
+                    System.out.print("* ");
+                } else {
+                    System.out.print("- ");
+                }
             }
             System.out.println();
         }
@@ -531,10 +572,81 @@ class TransportionSolution {
 
 
     /* getter and setter */
-    public int[] getSupplier() {return supplier;}
-    public void setSupplier(int[] supplier) {this.supplier = supplier;numOfSupplier = supplier.length;}
-    public int[] getDemander() {return demander;}
-    public void setDemander(int[] demander) {this.demander = demander;numOfDemander = demander.length;}
-    public int[][] getCostTab() {return costTab;}
-    public void setCostTab(int[][] costTab) {this.costTab = costTab;}
+    public int[] getSupplier() {
+        return supplier;
+    }
+    public void setSupplier(int[] supplier) {
+        this.supplier = supplier;numOfSupplier = supplier.length;
+    }
+    public int[] getDemander() {
+        return demander;
+    }
+    public void setDemander(int[] demander) {
+        this.demander = demander;numOfDemander = demander.length;
+    }
+    public int[][] getCostTab() {
+        return costTab;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public int[][] getPlanTab() {
+        return planTab;
+    }
+
+    public void setCostTab(int[][] costTab) {
+        this.costTab = costTab;
+    }
+
+
+
+    public boolean isOpenProcessPrint() {
+        return openProcessPrint;
+    }
+
+    public void setOpenProcessPrint(boolean openProcessPrint) {
+        this.openProcessPrint = openProcessPrint;
+    }
+
+    public List<int[][]> getRecordPlan() {
+        return recordPlan;
+    }
+
+    public void setRecordPlan(List<int[][]> recordPlan) {
+        this.recordPlan = recordPlan;
+    }
+
+    public List<Integer> getRecordTotal() {
+        return recordTotal;
+    }
+
+    public void setRecordTotal(List<Integer> recordTotal) {
+        this.recordTotal = recordTotal;
+    }
+
+    public List<int[][]> getRecordCheckField() {
+        return recordCheckField;
+    }
+
+    public void setRecordCheckField(List<int[][]> recordCheckField) {
+        this.recordCheckField = recordCheckField;
+    }
+
+    public List<List<Point>> getRecordLoop() {
+        return recordLoop;
+    }
+
+    public void setRecordLoop(List<List<Point>> recordLoop) {
+        this.recordLoop = recordLoop;
+    }
+
+    public List<Integer> getRecordAdjust() {
+        return recordAdjust;
+    }
+
+    public void setRecordAdjust(List<Integer> recordAdjust) {
+        this.recordAdjust = recordAdjust;
+    }
 }

@@ -3,13 +3,16 @@ package com.songlian.logistics.controller;
 
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
+import com.songlian.logistics.dao.MaterialDao;
 import com.songlian.logistics.pojo.Material;
 import com.songlian.logistics.service.MaterialService;
+import org.apache.ibatis.javassist.bytecode.ExceptionsAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -24,6 +27,8 @@ import java.util.List;
 public class MaterialController {
     @Autowired
     private MaterialService materialService;
+    @Autowired
+    private MaterialDao materialDao;
 
     // 查询全部
     @GetMapping
@@ -108,6 +113,16 @@ public class MaterialController {
     @GetMapping("piecharts")
     public Result piechartsData(){
         return materialService.materialCountOfPieCharts(null,null);
+    }
+
+    @GetMapping("getAllMaterialCount")
+    public Result getAllMaterialCount(){
+        try {
+            List<Map> data = materialDao.getAllMaterialCount();
+            return Result.success(data,data.size());
+        }catch (Exception e){
+            return Result.error(500,"服务器异常,获取库存材料信息失败");
+        }
     }
 }
 

@@ -5,6 +5,8 @@ import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.OrderForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.HashMap;
+
 /**
  * <p>
  *  服务类
@@ -15,4 +17,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface OrderFormService extends IService<OrderForm> {
     public Result pageList(QueryPageParam query);
+
+    public Result genOrder(HashMap map);
 }

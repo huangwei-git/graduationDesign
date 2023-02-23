@@ -36,4 +36,14 @@ public interface MaterialDao extends BaseMapper<Material> {
 
     //@Select("select * from material where material_id=1;")
     public List<Map> getMaterialCountOfBarCharts(@Param("mid") Integer mid,@Param("name") String name);
+
+    @Select("SELECT\n" +
+            "            mat.material_id as mid,\n" +
+            "            mat.`name` as name,\n" +
+            "            SUM(inv.amount) as count\n" +
+            "        FROM `inventory` inv\n" +
+            "                 RIGHT OUTER JOIN  `material` mat\n" +
+            "                            ON inv.material_id=mat.material_id\n" +
+            "        GROUP BY(inv.material_id)")
+    public List<Map> getAllMaterialCount();
 }

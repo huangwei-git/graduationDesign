@@ -6,7 +6,7 @@
               </span>
     </div>
 
-    <el-dropdown style="width: 100px;">
+    <el-dropdown style="width: 110px;">
       <div style="cursor: pointer">
         <el-avatar
             class="sl-no"
@@ -43,12 +43,11 @@ export default {
     }
   },
   beforeMount() {
-    let username = this.username = sessionStorage.getItem("username");
-    if(username == null){
+    this.username = sessionStorage.getItem("username")?JSON.parse(sessionStorage.getItem("username")):null;
+    if(this.username == null){
       alert("请先登陆!");
       this.$router.push("/login");
-    }else
-      JSON.parse(sessionStorage.getItem("username"));
+    }
   },
   methods:{
     collapse(){
@@ -87,7 +86,7 @@ export default {
       });
     }
   },beforeDestroy() {
-    sessionStorage.removeItem("username");
+    //sessionStorage.removeItem("username");
   }
 }
 </script>

@@ -1,6 +1,7 @@
 package com.songlian.logistics;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.songlian.logistics.calculate.TSP.TspSolution;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.InventoryDao;
@@ -16,11 +17,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 @SpringBootTest
@@ -38,6 +35,9 @@ class SpringbootApplicationTests {
 
     @Autowired
     private InventoryService inventoryService;
+
+    @Autowired
+    private OrderFormService orderFormService;
 
     @Autowired
     private MaterialDao materialDao;
@@ -102,6 +102,15 @@ class SpringbootApplicationTests {
 
     @Test
     public void testUpdateTime(){
+        int g[][] = {
+                {0,3,10000,8,9},
+            {3,0,3,10,5},
+            {100000,3,0,4,3},
+            {8,10,4,0,20},
+            {9,5,3,20,0}
+        };
+
+        new TspSolution(g).getPath();
     }
 
 }

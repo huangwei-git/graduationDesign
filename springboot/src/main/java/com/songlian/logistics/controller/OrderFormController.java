@@ -1,14 +1,16 @@
 package com.songlian.logistics.controller;
 
 
-import com.songlian.logistics.pojo.OrderDetail;
+import cn.hutool.json.JSON;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.OrderForm;
 import com.songlian.logistics.service.OrderFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -57,6 +59,11 @@ public class OrderFormController {
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable Integer id){
         return orderFormService.removeById(id);
+    }
+
+    @PostMapping("/comptude")
+    public Result compute(@RequestBody HashMap map){
+        return orderFormService.genOrder(map);
     }
 }
 

@@ -1,4 +1,4 @@
-package com.songlian.TransportionProblem;
+package com.songlian.logistics.calculate.Transport;
 
 public class Main {
     public static void main(String[] args) {
