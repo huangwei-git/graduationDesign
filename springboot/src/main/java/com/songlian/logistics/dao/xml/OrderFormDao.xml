@@ -2,4 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.songlian.logistics.dao.OrderFormDao">
 
+    <select id="orderList" resultType="java.util.HashMap">
+        SELECT
+            CAST(oft.order_id as char) as orderId ,
+            mat.name as materialName,
+            oft.create_date as createTime,
+            oft.amount,
+            oft.amount * mat.cost as cost,
+            oft.amount * mat.price as price,
+            SUM(toll) as toll,
+            oft.amount * (mat.price - mat.cost) as profit,
+            oft.amount * (mat.price + mat.cost) + SUM(toll) as total
+        FROM `order_form` oft LEFT JOIN `material` mat ON oft.material_id = mat.material_id
+                              LEFT JOIN `order_detail` odt ON oft.order_id = odt.order_id
+        WHERE
+            1 = 1
+            <if test="orderId != null">
+                AND CAST(oft.order_id as char) LIKE #{orderId}
+            </if>
+            <if test="materialName != null">
+                AND mat.name LIKE #{materialName}
+            </if>
+        GROUP BY odt.order_id
+        <if test="sortField!=null">
+            order by ${sortField} ${sortDirection}
+        </if>
+        LIMIT #{pageStart} , #{pageSize};
+    </select>
 </mapper>

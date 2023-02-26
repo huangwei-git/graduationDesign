@@ -102,7 +102,7 @@
           @current-change="handleCurrentChange"
           :current-page.sync="pageData.pageNum"
           :page-size="pageData.pageSize"
-          :page-sizes="[2,5,,10,15,20]"
+          :page-sizes="[5,10,15,20]"
           layout="total,sizes,prev, pager, next, jumper"
           :total="pageData.totalPage"
           :hide-on-single-page="false">

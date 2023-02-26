@@ -95,10 +95,9 @@
     </div>
 
     <div >
-      <el-button-group>
-        <el-button type="warning" @click="addUser" icon="el-icon-plus">新增员工</el-button>
-        <el-button type="warning" icon="el-icon-minus" @click="handlerDeleteAllSelected" :disabled="handleDisable">批量删除</el-button>
-        <el-button type="warning" icon="el-icon-delete" @click="clearFilter">清除过滤器</el-button>
+
+        <el-button type="success" @click="addUser" icon="el-icon-plus">新增员工</el-button>
+        <el-button type="warning" icon="el-icon-delete" @click="clearFilter"  style="margin-left: 5px">清除过滤器</el-button>
 
         <el-upload
             :show-file-list="false"
@@ -107,11 +106,10 @@
             action="http://localhost:9090/user/import"
           style="display: inline-block"
         >
-        <el-button type="warning" icon="el-icon-upload2">导入数据</el-button>
+        <el-button type="warning" icon="el-icon-upload2"  style="margin-left: 5px">导入数据</el-button>
         </el-upload>
 
-        <el-button type="warning" icon="el-icon-download" @click="exportData">导出数据</el-button>
-      </el-button-group>
+        <el-button type="warning" icon="el-icon-download" @click="exportData" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortValue" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -140,14 +138,12 @@
         :data="tableData"
         stripe
         border
-        @selection-change="handleSelectionChange"
         :default-sort = "{prop: 'job', order: 'inscending'}"
         :cell-style="{ textAlign: 'center' }"
         :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
         style="margin-top: 10px;"
         @row-click="recordRowInfo"
     >
-      <el-table-column fixed align="center" type="selection" width="45"></el-table-column>
       <el-table-column fixed type="index" width="60%">
         <template slot="header" slot-scope="scope">序号</template>
       </el-table-column>
@@ -636,29 +632,6 @@ export default {
           this.pageData.params.endTime = '';
         }
     },
-    handleSelectionChange(val) {
-      if(val.length) this.handleDisable = false;
-      else this.handleDisable = true;
-      this.currentSelected = val;
-    },
-    // “批量删除”操作
-    handlerDeleteAllSelected(){
-      this.$confirm('此操作将永久删除所选记录, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$notify.error({
-          title: '删除失败',
-          message: '权限不足'
-        });
-      }).catch(() => {
-        this.$notify.info({
-          type: 'info',
-          message: '已取消删除',
-        });
-      });
-    },
     // 获取被点击的行信息
     recordRowInfo(row){
       this.clickedRow = row;
@@ -681,7 +654,6 @@ export default {
       date:['',''],
       loading: true,
       inputIconClass:'el-icon-user',
-      handleDisable:true,
       currentSelected:[],
       clickedRowInfo:null,
       selectSex:'',

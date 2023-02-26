@@ -18,4 +18,5 @@ public interface LocationDao extends BaseMapper<Location> {
     @Autowired
     public Location testloc();
 
+
 }

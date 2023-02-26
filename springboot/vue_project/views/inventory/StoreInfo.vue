@@ -22,11 +22,9 @@
     </div>
 
     <div >
-      <el-button-group>
-        <el-button type="warning" @click="addTable" icon="el-icon-plus">新增记录</el-button>
-        <el-button type="warning" icon="el-icon-upload2">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download">导出数据</el-button>
-      </el-button-group>
+        <el-button type="success" @click="addTable" icon="el-icon-plus">新增记录</el-button>
+        <el-button type="warning" icon="el-icon-upload2"  style="margin-left: 5px">导入数据</el-button>
+        <el-button type="warning" icon="el-icon-download"  style="margin-left: 5px">导出数据</el-button>
     </div>
 
     <!--暂时隐藏-->
@@ -82,7 +80,7 @@
           @current-change="handleCurrentChange"
           :current-page.sync="pageData.pageNum"
           :page-size="pageData.pageSize"
-          :page-sizes="[2,5,,10,15,20]"
+          :page-sizes="[5,10,15,20]"
           layout="total,sizes,prev, pager, next, jumper"
           :total="pageData.totalPage"
           :hide-on-single-page="false">

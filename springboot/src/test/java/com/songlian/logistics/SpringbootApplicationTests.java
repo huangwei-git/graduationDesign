@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.songlian.logistics.calculate.TSP.TspSolution;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
-import com.songlian.logistics.dao.InventoryDao;
-import com.songlian.logistics.dao.LocationDao;
-import com.songlian.logistics.dao.MaterialDao;
-import com.songlian.logistics.dao.UserDao;
+import com.songlian.logistics.dao.*;
 import com.songlian.logistics.pojo.Inventory;
 import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.pojo.Material;
@@ -50,6 +47,13 @@ class SpringbootApplicationTests {
 
     @Autowired
     private InventoryDao inventoryDao;
+
+    @Autowired
+    private OrderFormDao orderFormDao;
+
+    @Autowired
+    private OrderDetailDao orderDetailDao;
+
 
     public static int i = 0;
 
@@ -102,15 +106,13 @@ class SpringbootApplicationTests {
 
     @Test
     public void testUpdateTime(){
-        int g[][] = {
-                {0,3,10000,8,9},
-            {3,0,3,10,5},
-            {100000,3,0,4,3},
-            {8,10,4,0,20},
-            {9,5,3,20,0}
-        };
-
-        new TspSolution(g).getPath();
+        String orderId = "%%";
+        String materialName = "%%";
+        String supplierName = "%%";
+        String demanderName = "%%";
+        orderDetailDao.orderDetailList(orderId,materialName,supplierName,demanderName,null,"0",0l,50l).forEach(item -> {
+            System.out.println("item = " + item);
+        });
     }
 
 }

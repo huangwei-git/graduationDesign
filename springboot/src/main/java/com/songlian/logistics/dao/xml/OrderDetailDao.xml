@@ -2,4 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.songlian.logistics.dao.OrderDetailDao">
 
+    <select id="orderDetailList" resultType="java.util.HashMap">
+        SELECT
+            CAST(odt.order_id as char) as orderId ,
+            mat.name as materialName,
+            odt.amount as amount,
+            locSup.name as supplierName,
+            locDem.name as demanderName,
+            odt.amount * mat.cost as cost,
+            odt.amount * mat.price as price,
+            toll,
+            odt.amount * (mat.price - mat.cost) as profit,
+            odt.amount * (mat.price + mat.cost) + toll as total,
+            seq
+        FROM `order_detail` odt LEFT JOIN `location` locSup ON locSup.loc_id = supplier_loc_id
+                                LEFT JOIN `location` locDem ON locDem.loc_id = demander_loc_id
+                                LEFT JOIN `order_form` oft ON oft.order_id = odt.order_id
+                                LEFT JOIN `material` mat ON oft.material_id = mat.material_id
+        WHERE
+            1 = 1
+            <if test="orderId != null">
+                AND CAST(odt.order_id as char) LIKE #{orderId}
+            </if>
+            <if test="materialName != null">
+                AND mat.name LIKE #{materialName}
+            </if>
+            <if test="supplierName != null">
+                AND locSup.name LIKE #{supplierName}
+            </if>
+            <if test="demanderName != null">
+                AND locDem.name LIKE #{demanderName}
+            </if>
+        <if test="sortField!=null">
+                    order by ${sortField} ${sortDirection}
+        </if>
+        LIMIT #{pageStart} , #{pageSize};
+
+    </select>
 </mapper>

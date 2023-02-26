@@ -17,7 +17,7 @@ public class Path {
         for(int i = 1;i < list.size() + 1;i++){
             HashMap map = list.get(i - 1);
             int toll = (int) map.get("toll");
-            int idx = (int) map.get("index");
+            int idx = (int) map.get("seq");
             graph[0][i] = graph[i][0] = toll/10;
             indexList.add(idx);
         }

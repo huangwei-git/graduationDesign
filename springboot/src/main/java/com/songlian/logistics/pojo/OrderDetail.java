@@ -1,6 +1,8 @@
 package com.songlian.logistics.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,16 +25,27 @@ public class OrderDetail implements Serializable {
     @TableId(value = "detail_id",type = IdType.AUTO)
     private Integer detailId;
 
+    // 订单ID
     @TableField("order_id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long orderId;
 
-    @TableField("t_uid")
-    private Integer uid;
+    // 从哪运
+    @TableField("supplier_loc_id")
+    private Integer supplierLocId;
 
-    @TableField("loc_receive_id")
-    private Integer locReceiveId;
+    // 运去哪
+    @TableField("demander_loc_id")
+    private Integer demanderLocId;
 
+    // 运输量
     private Integer amount;
+
+    // 运费
+    private Integer toll;
+
+    // 运输顺序
+    private Integer seq;
 
     @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;

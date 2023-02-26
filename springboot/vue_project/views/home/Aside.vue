@@ -29,7 +29,7 @@
         <span slot="title">仓库信息</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item index="locationInfo">坐标管理</el-menu-item>
+        <el-menu-item index="locationInfo">地址信息</el-menu-item>
         <el-menu-item index="storeInfo">仓库管理</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
@@ -42,7 +42,6 @@
       <el-menu-item-group>
         <el-menu-item index="/materialInfo">物品信息</el-menu-item>
         <el-menu-item index="/materialCount">数量统计</el-menu-item>
-        <el-menu-item index="/materialEcharts">图表分析</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
@@ -52,7 +51,8 @@
         <span slot="title">订单管理</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item index="/addOrder">添加订单</el-menu-item>
+        <el-menu-item index="/orderList">查看订单</el-menu-item>
+        <el-menu-item index="/orderDetailList">订单详情</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 

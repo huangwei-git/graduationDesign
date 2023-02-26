@@ -6,6 +6,7 @@ import com.songlian.logistics.pojo.OrderForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -19,4 +20,6 @@ public interface OrderFormService extends IService<OrderForm> {
     public Result pageList(QueryPageParam query);
 
     public Result genOrder(HashMap map);
+
+    public List<HashMap> getOrderBuffer(String key);
 }

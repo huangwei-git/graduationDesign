@@ -1,12 +1,16 @@
 package com.songlian.logistics.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -23,13 +27,9 @@ public class OrderForm implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "order_id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long orderId;
 
-    @TableField("m_uid")
-    private Integer uid;
-
-    @TableField("loc_send_id")
-    private Integer locSendId;
 
     @TableField("material_id")
     private Integer materialId;
@@ -44,10 +44,3 @@ public class OrderForm implements Serializable {
     @TableLogic(value = "0" ,delval = "1")
     private Integer deleted;
 }
-
-//{
-//        "managerId": 1,
-//        "locationId": 1,
-//        "materialId": 1,
-//        "amount":10
-//        }

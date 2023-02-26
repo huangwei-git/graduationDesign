@@ -19,10 +19,9 @@
     </div>
 
     <div >
-      <el-button-group>
-        <el-button type="warning" icon="el-icon-upload2">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download">导出数据</el-button>
-      </el-button-group>
+        <!--<MaterialEcharts style="display: inline-block;"/>-->
+        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
+        <el-button type="warning" icon="el-icon-download"  style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -41,89 +40,67 @@
     <div class="empty" style="display: flex;text-align:center;justify-content: center;width: 100%">
       <el-empty description="暂无数据" v-show="(tableData.length==0 && !loading)"></el-empty>
     </div>
-    <div class="tab_div" align="center">
-      <el-table
-          v-show="(tableData.length > 0 || loading)"
-          ref="mutiTable"
-          v-loading="loading"
-          :data="tableData"
-          stripe
-          border
-          :default-sort = "{prop: 'mid', order: 'inscending'}"
-          :cell-style="{ textAlign: 'center' }"
-          :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
-          style="margin-top: 10px;width: 562px;"
-          @row-click="recordRowInfo"
-      >
+    <div class="tab_div" align="center" style="margin-top: 20px">
+      <el-row>
+        <el-col :span="9" :push="4">
+          <el-table
+              v-show="(tableData.length > 0 || loading)"
+              ref="mutiTable"
+              v-loading="loading"
+              :data="tableData"
+              stripe
+              border
+              :cell-style="{ textAlign: 'center' }"
+              :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
+              style="width:80%;display: inline-block"
+              @row-click="recordRowInfo">
 
-        <el-table-column type="index" width="60%">
-          <template slot="header" slot-scope="scope">序号</template>
-        </el-table-column>
+            <el-table-column type="index">
+              <template slot="header" slot-scope="scope">序号</template>
+            </el-table-column>
 
-        <el-table-column prop="materialId" label="物品编号" width="100%">
-          <template slot-scope="scope">
-            <el-tag>{{scope.row.materialId}}</el-tag>
-          </template>
-        </el-table-column>
+            <el-table-column prop="materialId" label="物品编号">
+              <template slot-scope="scope">
+                <el-tag>{{scope.row.materialId}}</el-tag>
+              </template>
+            </el-table-column>
 
-        <el-table-column prop="name"  label="物品名称" width="100px"></el-table-column>
-        <el-table-column prop="count"  label="库存数" width="120px"></el-table-column>
+            <el-table-column prop="name"  label="物品名称"></el-table-column>
+            <el-table-column prop="count"  label="库存数"></el-table-column>
 
-        <el-table-column prop="operate" width="180px" align="right">
-          <template slot="header" slot-scope="scope">操作</template>
-          <template slot-scope="scope">
-            <el-button icon="el-icon-edit" @click="editTable(scope.row)" size="small">编辑</el-button>
-            <el-button icon="el-icon-delete" type="danger" @click="deleteUser" size="small">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          </el-table>
+
+          <!-- 分页 -->
+          <div style="padding: 10px 0;text-align: center">
+            <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page.sync="pageData.pageNum"
+                :page-size="pageData.pageSize"
+                :page-sizes="[5,10,15,20]"
+                layout="total,sizes,prev, pager, next, jumper"
+                :total="pageData.totalPage"
+                :hide-on-single-page="false">
+            </el-pagination>
+          </div>
+        </el-col>
+
+        <el-col :span="10" :push="4">
+          <MaterialEcharts style="display: inline-block;"/>
+        </el-col>
+      </el-row>
     </div>
 
 
-    <!-- 分页 -->
-    <div style="padding: 10px 0;text-align: center">
-      <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="pageData.pageNum"
-          :page-size="pageData.pageSize"
-          :page-sizes="[2,5,,10,15,20]"
-          layout="total,sizes,prev, pager, next, jumper"
-          :total="pageData.totalPage"
-          :hide-on-single-page="false">
-      </el-pagination>
-    </div>
 
 
-    <!-- 对话框 增、改信息 -->
-    <el-dialog
-        title="物品信息"
-        :visible.sync="centerDialogVisible"
-        width="20%"
-        center>
-      <el-form :model="form" :rules="rules"  ref="addForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label=物品名称 prop="name">
-          <el-input style="width: 180px" v-model="form.name"></el-input>
-        </el-form-item>
-
-        <el-form-item label="运输量/车" prop="count">
-          <el-input-number v-model="form.count" :step="1" :min="1" step-strictly></el-input-number>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" @click="saveOrUpdate()">{{addBtnText}}</el-button>
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
-        </el-form-item>
-
-      </el-form>
-    </el-dialog>
 
   </div>
 </template>
 
 <script>
-
+import MaterialEcharts from "./MaterialEcharts";
 export default {
   name: "MaterfialCount",
   methods:{
@@ -395,7 +372,6 @@ export default {
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur'] }
         ]
       },
-      // 对话框
     }
   },
   beforeMount() {
@@ -410,8 +386,10 @@ export default {
           this.resetForm();
       }
     },
-
-  }
+  },
+  components:{
+    MaterialEcharts
+}
 }
 </script>
 

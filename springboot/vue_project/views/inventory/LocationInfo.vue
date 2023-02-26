@@ -28,19 +28,18 @@
           <el-option value="1" label="需求地"></el-option>
         </el-select>
 
-        <el-button-group style="margin-left: 5px">
-          <el-button icon="el-icon-search" type="primary" @click="search">搜索</el-button>
+          <el-button icon="el-icon-search" type="primary" @click="search" style="margin-left: 5px">搜索</el-button>
           <el-button icon="el-icon-refresh" type="primary" @click="resetSearch" style="margin-left: 5px">重置</el-button>
-        </el-button-group>
+
       </div>
     </div>
 
     <div >
-      <el-button-group>
-        <el-button type="warning" @click="addTable" icon="el-icon-plus">新增记录</el-button>
-        <el-button type="warning" icon="el-icon-upload2">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download">导出数据</el-button>
-      </el-button-group>
+
+        <LocationEcharts style="display: inline-block;margin-left: 0px"/>
+        <el-button type="success" @click="addTable" icon="el-icon-plus" style="margin-left: 5px">新增地址</el-button>
+        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
+        <el-button type="warning" icon="el-icon-download" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -88,8 +87,8 @@
         <el-table-column prop="name"  label="地点名称" width="100px"></el-table-column>
         <el-table-column  label="地点类型" width="120px">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.type == 0" type="danger" effect="plain" >运输中心</el-tag>
-            <el-tag v-if="scope.row.type == 1" type="warning" effect="plain" >需求地</el-tag>
+            <el-tag v-if="scope.row.type == 0" type="success" effect="light" >运输中心</el-tag>
+            <el-tag v-if="scope.row.type == 1" type="warning" effect="light" >需求地</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="坐标" width="100px">
@@ -117,7 +116,7 @@
           @current-change="handleCurrentChange"
           :current-page.sync="pageData.pageNum"
           :page-size="pageData.pageSize"
-          :page-sizes="[2,5,,10,15,20]"
+          :page-sizes="[5,10,15,20]"
           layout="total,sizes,prev, pager, next, jumper"
           :total="pageData.totalPage"
           :hide-on-single-page="false">
@@ -163,6 +162,8 @@
 </template>
 
 <script>
+
+import LocationEcharts from "./LocationEcharts";
 
 export default {
   name: "MaterfialInfo",
@@ -482,7 +483,9 @@ export default {
           this.resetForm();
       }
     },
-
+  },
+  components:{
+    LocationEcharts
   }
 }
 </script>

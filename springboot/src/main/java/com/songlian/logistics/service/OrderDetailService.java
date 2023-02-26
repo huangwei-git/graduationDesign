@@ -1,7 +1,12 @@
 package com.songlian.logistics.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.songlian.logistics.common.QueryPageParam;
+import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.OrderDetail;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,7 @@ import com.songlian.logistics.pojo.OrderDetail;
  */
 public interface OrderDetailService extends IService<OrderDetail> {
 
+    public Result createOrderDetail(Long id,int materialId, List<HashMap> list);
+
+    public Result pageList(QueryPageParam query);
 }

@@ -35,7 +35,6 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialDao, Material> impl
     @Override
     public Result pageList(QueryPageParam query) {
         try {
-            System.out.println("query = " + query);
             // 获取分页参数
             long size = (long) query.getPageSize();
             long num = (long) query.getPageNum();

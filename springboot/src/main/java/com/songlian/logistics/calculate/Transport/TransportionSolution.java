@@ -80,8 +80,6 @@ public class TransportionSolution {
             printArray(planTab);
             System.out.println("需要的价格为：" + this.total);
         }
-        recordPlan.add(planTab);
-        recordTotal.add(this.total);
     }
 
     // 0. 产销平衡化
@@ -236,7 +234,7 @@ public class TransportionSolution {
             System.out.println("==========初始解决方案==========");
             printArray(planTab);
         }
-        recordPlan.add(this.planTab);
+        recordPlan.add(this.clonePlanTable());
         recordTotal.add(this.calcTotal());
     }
 
@@ -311,7 +309,8 @@ public class TransportionSolution {
             System.out.println("==========初始解决方案==========");
             printArray(planTab);
         }
-        this.recordPlan.add(this.planTab);
+        
+        this.recordPlan.add(this.clonePlanTable());
         this.recordTotal.add(this.calcTotal());
     }
 
@@ -527,8 +526,10 @@ public class TransportionSolution {
             System.out.println("调整后运费：" + newTotal);
             System.out.println("节省运费：" + (oldTotal - newTotal));
         }
-        this.recordPlan.add(this.planTab);
-        this.recordTotal.add(newTotal);
+        if(delta > 0){
+            this.recordPlan.add(this.clonePlanTable());
+            this.recordTotal.add(newTotal);
+        }
     }
 
     // 7. 计算总运费
@@ -600,7 +601,15 @@ public class TransportionSolution {
         this.costTab = costTab;
     }
 
-
+    public int[][] clonePlanTable() {
+        int clone[][] = new int[this.numOfSupplier][this.numOfDemander];
+        for (int i = 0; i < this.numOfSupplier; i++) {
+            for (int j = 0; j < this.numOfDemander; j++) {
+                clone[i][j] = this.planTab[i][j];
+            }
+        }
+        return clone;
+    }
 
     public boolean isOpenProcessPrint() {
         return openProcessPrint;
@@ -649,4 +658,5 @@ public class TransportionSolution {
     public void setRecordAdjust(List<Integer> recordAdjust) {
         this.recordAdjust = recordAdjust;
     }
+
 }

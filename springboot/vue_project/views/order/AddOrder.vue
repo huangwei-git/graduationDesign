@@ -2,23 +2,8 @@
   <div id="root">
 
     <!--=========顶部按钮组============-->
-    <div style="margin-bottom: 10px;" class="sl-no">
-        <el-button-group style="margin-left: 5px">
-          <el-button icon="el-icon-document-add" type="primary" @click="createDialogVisible = true" >创建订单</el-button>
-          <el-button icon="el-icon-view" type="primary" @click="displayDialogVisible = true" style="margin-left: 5px">查看方案</el-button>
-          <el-button icon="el-icon-place" type="success" @click="calcDist = false;point={x:'',y:''}" style="margin-left: 5px">查看坐标</el-button>
-          <el-button icon="el-icon-cpu" type="success" @click="calcDist = true;point={x:'',y:''}" style="margin-left: 5px">计算运费</el-button>
-        </el-button-group>
-
-      <span style="position: absolute;right: 20px;line-height: 40px">
-        <el-tag :type="calcDist?'danger':'primary'" effect="dark" style="font-size: 16px">{{msg}}</el-tag>
-      </span>
-    </div>
-    <!--===========Echarts图==========-->
-    <el-card style="display: inline-block;width:100%;padding: 10px">
-      <div id="graph" style="width:100%;height: 745px"></div>
-    </el-card>
-
+        <el-button icon="el-icon-document-add" type="success" @click="createDialogVisible = true" >创建订单</el-button>
+        <el-button icon="el-icon-view" type="success" @click="displayDialogVisible = true" style="margin-left: 5px">查看方案</el-button>
     <!--==========查看方案===========-->
     <el-dialog
         title="查看方案"
@@ -131,18 +116,38 @@ export default {
     dataFormat(res){
       if(res.code == 200){
         this.storeInfo = res.data;
-        console.log(this.storeInfo)
       }else{
         alert(res.msg);
       }
-      this.$nextTick(()=>{
-      })
     },
     loadPost(){
       this.$axios.get(this.$httpUrl+'/material/getAllMaterialCount',)
           .then(res => res.data)
           .then(res => {
             this.dataFormat(res);
+          }).then(()=>{
+            this.restValue = 0;
+            this.selectedMaterial = '';
+      })
+    },
+    loadLocation(){
+      this.$axios.get(this.$httpUrl + "/location")
+          .then(res => res.data)
+          .then(res => {
+            let cnt = 0;
+            for(let i = 0;i < res.total;i++){
+              let item = {
+                'name':res.data[i].name,
+                'x':res.data[i].xpos,
+                'y':res.data[i].ypos,
+                locId:res.data[i].locId,
+              };
+              if(res.data[i].type == 0) this.transportPointsData.push(item);
+              else{
+                this.demandPointsData.push(item);
+              }
+            }
+            this.totalDemands = this.demandPointsData.length;
           })
     },
     getSolution() {
@@ -197,6 +202,8 @@ export default {
           }).then(()=>{
             this.displayDialogVisible = false;
             this.initSelect();
+      }).then(()=>{
+          this.$bus.$emit('submitOrder',"成功创建！");
       })
     },
     initSelect(){
@@ -223,6 +230,10 @@ export default {
       this.oldValue = this.formData.num[index];
       this.newValue = this.formData.num[index];
       this.mutex = index;
+    },
+    reloadPost(msg){
+      console.log(msg);
+      this.loadPost();
     },
     handleClose(done) {
       if(this.tableData == '' && this.displayDialogVisible) return done();
@@ -257,12 +268,6 @@ export default {
       createDialogVisible:false,
       displayDialogVisible:false,
       // 计算选择的点的距离
-      point:{
-        x:'',
-        y:''
-      },
-      calcDist:false,
-      msg:'点击图中的位置',
     }
   },
   watch:{
@@ -280,114 +285,12 @@ export default {
         }
       }
     },
-    point:{
-      deep:true,
-      handler(n,o){
-        if(o.x != '' && this.calcDist){
-          let dist = Math.sqrt((n.x - o.x) * (n.x - o.x) + (n.y - o.y) * (n.y - o.y));
-           this.msg = "运费："+ Math.floor(dist)
-        }
-      }
-    }
   },
   mounted() {
-    var locationChartDom = document.getElementById('graph');
-    var locationChart = echarts.init(locationChartDom);
-    var locationOption;
-
-    locationOption = {
-      title: {
-        text: '运输中心与需求地的位置关系图',
-      },
-      animationDurationUpdate: 1500,
-      animationEasingUpdate: 'quinticInOut',
-      series: [
-        {
-          type: 'graph',
-          layout: 'none',
-          symbolSize: 80,
-          roam: false,
-          label: {
-            show: true,
-            normal:{
-              show:true,
-              textStyle:{
-                fontSize:15,
-              }
-            }
-          },
-          edgeSymbol: ['circle', 'arrow'],
-          edgeSymbolSize: [4, 10],
-          edgeLabel: {
-            fontSize: 20
-          },
-          data: [],
-          lineStyle: {
-            opacity: 0.9,
-            width: 2,
-            curveness: 0
-          },
-        },
-        {
-          type: 'graph',
-          layout: 'none',
-          symbolSize: 70,
-          label: {
-            show: true,
-            normal:{
-              show:true,
-              textStyle:{
-                fontSize:15,
-              }
-            }
-          },
-          edgeSymbol: ['circle', 'arrow'],
-          edgeSymbolSize: [4, 10],
-          edgeLabel: {
-            fontSize: 20
-          },
-          data: [],
-          lineStyle: {
-            opacity: 0.9,
-            width: 2,
-            curveness: 0
-          }
-        }
-      ]
-    };
-
-    this.$axios.get(this.$httpUrl + "/location")
-        .then(res => res.data)
-        .then(res => {
-          let cnt = 0;
-          for(let i = 0;i < res.total;i++){
-            let item = {
-              'name':res.data[i].name,
-              'x':res.data[i].xpos,
-              'y':res.data[i].ypos,
-              locId:res.data[i].locId,
-            };
-            if(res.data[i].type == 0) this.transportPointsData.push(item);
-            else{
-              this.demandPointsData.push(item);
-            }
-          }
-          this.totalDemands = this.demandPointsData.length;
-          locationOption.series[0].data = this.transportPointsData;
-          locationOption.series[1].data = this.demandPointsData;
-        }).then(() => {
-          console.log(this.demandPointsData)
-      locationOption && locationChart.setOption(locationOption);
-    })
-
-    locationChart.on('click',(query)=>{
-      console.log(query.data);
-      //this.$message.info(`(${query.data.x} , ${query.data.y})`);
-      this.point = {x:query.data.x , y:query.data.y}
-      if(!this.calcDist) this.msg = "坐标：("+ this.point.x + ', ' + this.point.y + ')';
-    })
+    this.$bus.$on("orderListLoaded",this.reloadPost);
   },
   beforeMount() {
+    this.loadLocation();
     this.loadPost();
   },
 }
