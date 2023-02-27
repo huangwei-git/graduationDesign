@@ -22,7 +22,7 @@
         <i class="el-icon-arrow-down sl-no" style="margin-left: 5px"></i>
       </div>
       <el-dropdown-menu align="center" slot="dropdown">
-        <el-dropdown-item>个人主页</el-dropdown-item>
+        <el-dropdown-item @click.native="toPersonalHomePage">个人主页</el-dropdown-item>
         <el-dropdown-item @click.native="logOut">退出登录</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -43,7 +43,7 @@ export default {
     }
   },
   beforeMount() {
-    this.username = sessionStorage.getItem("username")?JSON.parse(sessionStorage.getItem("username")):null;
+    this.username = sessionStorage.getItem("userForm")?JSON.parse(sessionStorage.getItem("userForm")).name:null;
     if(this.username == null){
       alert("请先登陆!");
       this.$router.push("/login");
@@ -73,6 +73,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        sessionStorage.removeItem("userForm")
         this.$router.push('/login');
         this.$message({
           type: 'success',
@@ -84,9 +85,11 @@ export default {
           message: '取消退出'
         });
       });
+    },
+    toPersonalHomePage(){
+      this.$router.push("/personalPage")
     }
   },beforeDestroy() {
-    //sessionStorage.removeItem("username");
   }
 }
 </script>

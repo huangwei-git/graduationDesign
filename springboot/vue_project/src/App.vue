@@ -15,6 +15,9 @@ export default {
   },
   components: {
     Home,
+  },
+  beforeDestroy() {
+    sessionStorage.removeItem("userForm");
   }
 }
 </script>

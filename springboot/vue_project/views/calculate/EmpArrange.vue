@@ -117,7 +117,7 @@ export default {
       ],
       randomRange:{
         people:[[40,100],[40,100],[60,120],[60,120],[120,180],[180,240],[200,260],[200,260],[180,260],[120,180],[60,120],[40,100]],
-        salary:[[62,74],[66,78],[70,82],[62,74],[58,70],[62,74],[70,82],[70,82],[70,82],[70,82],[58,70],[58,70]]
+        salary:[[100,150],[100,150],[100,150],[100,150],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120]]
       },
       solution:[{values:[],objValue:''}],
       fieldMap:[
@@ -160,7 +160,6 @@ export default {
         let rand = -1;
           rand = Math.random() * (range[i][1] - range[i][0] + 1) + range[i][1];
         arr[i] = Math.floor(rand);
-        console.log(rand);
       }
       return arr;
     },
@@ -168,12 +167,11 @@ export default {
       this.$axios.post(this.$httpUrl + "/user/empArrange",this.formData)
           .then(res => res.data)
           .then(res => {
-            console.log(res.data);
             if(res.code == 200){
               this.solution[0].values = res.data.values;
               this.solution[0].objValue = res.data.objValue;
             }else{
-              alert(res.data);
+              alert(res.msg);
             }
           })
     }

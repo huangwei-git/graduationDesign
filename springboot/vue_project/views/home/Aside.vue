@@ -1,8 +1,8 @@
 <template>
-  <el-menu :default-openeds="['1']"
+  <el-menu :default-openeds="[]"
            background-color="rgb(149,8,66)"
            text-color="#fff"
-           active-text-color="#ff0"
+           active-text-color="rgb(255,222,173)"
            :collapse-transition="false"
            :collapse="isCollapse"
            router>
@@ -15,34 +15,28 @@
     <el-submenu index="1">
       <template slot="title">
         <i class="el-icon-user"></i>
-        <span slot="title">员工管理</span>
+        <span class="" slot="title">员工管理</span>
       </template>
-      <el-menu-item-group>
-        <el-menu-item index="/">员工信息</el-menu-item>
-        <el-menu-item index="/userEcharts">图表分析</el-menu-item>
-      </el-menu-item-group>
+        <el-menu-item index="/userInfo"><span>员工信息</span></el-menu-item>
+        <el-menu-item index="/userEcharts"><span>图表分析</span></el-menu-item>
     </el-submenu>
 
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-office-building"></i>
-        <span slot="title">仓库信息</span>
+        <span slot="title">仓库管理</span>
       </template>
-      <el-menu-item-group>
-        <el-menu-item index="locationInfo">地址信息</el-menu-item>
-        <el-menu-item index="storeInfo">仓库管理</el-menu-item>
-      </el-menu-item-group>
+        <el-menu-item index="locationInfo"><span>地址信息</span></el-menu-item>
+        <el-menu-item index="storeInfo"><span>仓库信息</span></el-menu-item>
     </el-submenu>
 
     <el-submenu index="3">
       <template slot="title">
         <i class="el-icon-box"></i>
-        <span slot="title">物品信息</span>
+        <span slot="title">物品管理</span>
       </template>
-      <el-menu-item-group>
-        <el-menu-item index="/materialInfo">物品信息</el-menu-item>
-        <el-menu-item index="/materialCount">数量统计</el-menu-item>
-      </el-menu-item-group>
+        <el-menu-item index="/materialInfo"><span>物品信息</span></el-menu-item>
+        <el-menu-item index="/materialCount"><span>数量统计</span></el-menu-item>
     </el-submenu>
 
     <el-submenu index="4">
@@ -50,20 +44,16 @@
         <i class="el-icon-notebook-2"></i>
         <span slot="title">订单管理</span>
       </template>
-      <el-menu-item-group>
-        <el-menu-item index="/orderList">查看订单</el-menu-item>
-        <el-menu-item index="/orderDetailList">订单详情</el-menu-item>
-      </el-menu-item-group>
+        <el-menu-item index="/orderList"><span>查看订单</span></el-menu-item>
+        <el-menu-item index="/orderDetailList"><span>订单详情</span></el-menu-item>
     </el-submenu>
 
     <el-submenu index="5">
       <template slot="title">
-        <i class="el-icon-guide"></i>
-        <span slot="title">资源安排</span>
+        <i class="el-icon-cpu"></i>
+        <span slot="title">资源配置</span>
       </template>
-      <el-menu-item-group>
-        <el-menu-item index="/empArrange">人员配备</el-menu-item>
-      </el-menu-item-group>
+        <el-menu-item index="/empArrange"><span>员工安排</span></el-menu-item>
     </el-submenu>
 
   </el-menu>
@@ -102,5 +92,16 @@ export default {
   .el-menu{
     min-height: 100%;
     overflow-x: hidden;
+  }
+
+  .el-submenu__title i{
+    color: rgb(255,222,173);
+  }
+
+  .el-submenu .el-menu-item:hover{
+    background: #fc4668 !important;
+  }
+  .el-submenu .el-menu-item span{
+    padding-left: 30px;
   }
 </style>

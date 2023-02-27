@@ -1,4 +1,4 @@
-package com.songlian.logistics.calculate.DEV;
+package com.songlian.logistics.calculate.LP;
 
 public class LpData{
     // 目标系数

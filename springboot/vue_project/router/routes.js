@@ -12,6 +12,7 @@ import OrderList from "../views/order/OrderList";
 import OrderDetailList from "../views/order/OrderDetailList";
 import LocationEcharts from "../views/inventory/LocationEcharts";
 import EmpArrange from "../views/calculate/EmpArrange";
+import PersonalHomepage from "../views/personalPage/PersonalHomepage";
 
 export default new VueRouter({
     routes:[
@@ -19,8 +20,8 @@ export default new VueRouter({
         {
             path:'/',
             component:Home,
-            name:"home",
-            redirect:"/userInfo",
+            name:"login",
+            redirect:"/login",
             children:[
                 {
                     path:'userInfo',
@@ -61,6 +62,10 @@ export default new VueRouter({
                 {
                     path:'empArrange',
                     component:EmpArrange
+                },
+                {
+                    path:'personalPage',
+                    component:PersonalHomepage
                 }
             ]
         },

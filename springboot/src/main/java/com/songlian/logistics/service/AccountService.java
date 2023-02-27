@@ -5,6 +5,8 @@ import com.songlian.logistics.pojo.Account;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+
 /**
  * <p>
  *  服务类
@@ -15,5 +17,5 @@ import org.springframework.stereotype.Service;
  */
 
 public interface AccountService extends IService<Account> {
-    public Result login(Account account);
+    public Result login(HashMap map);
 }
