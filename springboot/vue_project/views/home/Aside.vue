@@ -59,25 +59,13 @@
     <el-submenu index="5">
       <template slot="title">
         <i class="el-icon-guide"></i>
-        <span slot="title">运输计划</span>
+        <span slot="title">资源安排</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item index="3-1">选项1</el-menu-item>
-        <el-menu-item index="3-2">选项2</el-menu-item>
+        <el-menu-item index="/empArrange">人员配备</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
-    <el-submenu index="6">
-      <template slot="title">
-        <i class="el-icon-pie-chart"></i>
-        <span slot="title">图表分析</span>
-      </template>
-      <el-menu-item-group>
-        <template slot="title">分组一</template>
-        <el-menu-item index="3-1">选项1</el-menu-item>
-        <el-menu-item index="3-2">选项2</el-menu-item>
-      </el-menu-item-group>
-    </el-submenu>
   </el-menu>
 </template>
 

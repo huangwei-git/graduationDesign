@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.songlian.logistics.calculate.DEV.EmployeeArrange;
+import com.songlian.logistics.calculate.DEV.LpData;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.UserDao;
@@ -15,6 +17,7 @@ import com.songlian.logistics.pojo.Location;
 import com.songlian.logistics.pojo.User;
 import com.songlian.logistics.service.LocationService;
 import com.songlian.logistics.service.UserService;
+import ilog.concert.IloException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Resource
     private UserDao userDao;
     @Autowired
-    private LocationService ls;
+    private LocationService locationService;
 
     private int saveNum = 0;
 
@@ -170,7 +173,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         LambdaQueryWrapper<Location> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Location::getType, 0);
         HashMap<String,Integer> locMapId = new HashMap<>();
-        ls.list(lqw).forEach(loc -> {
+        locationService.list(lqw).forEach(loc -> {
             locMapId.put(loc.getName(),loc.getLocId());
         });
         InputStream inputStream = file.getInputStream();
@@ -237,5 +240,56 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         map.put("male",male);
         map.put("female",female);
         return Result.success(map);
+    }
+
+    @Override
+    public Result empArrange(HashMap map) throws IloException {
+        LpData data = new LpData();
+        List peoples = (List) map.get("people");
+        List salarys = (List) map.get("salary");
+        Integer workTime = (Integer) map.get("workTime");
+        List rangeValue = (List) map.get("rangeValue");
+        boolean enableMin = (boolean) map.get("min");
+        boolean enableMax = (boolean) map.get("max");
+        double min = enableMin ? (int) rangeValue.get(0) : 0;
+        double max = enableMax ? (int) rangeValue.get(1): 1e15;
+
+        int len = 12;
+
+        //data.setConstrainNumber(len);
+        //data.setVariableNumber(len);
+        double constraintArray[] = new double[len + 2];
+        double objectiverArray[] = new double[len];
+        for(int i = 0;i < len;i++){
+            constraintArray[i] = Double.parseDouble(Integer.toString((Integer) peoples.get(i)));
+            objectiverArray[i] = Double.parseDouble(Integer.toString((Integer) salarys.get(i)));
+        }
+        constraintArray[12] = min;
+        constraintArray[13] = max;
+        // 设置资源限制
+        data.setConstraintValue(constraintArray);
+        // 设置价值系数
+        data.setObjectiveCoefficient(objectiverArray);
+        // 设置约束系数矩阵
+        data.setConstraintCoefficient(EmployeeArrange.getConstraintCoefficient(workTime,1));
+        // 变量个数
+        data.setVariableNumber(len);
+        // 约束个数
+        data.setConstrainNumber(len);
+        EmployeeArrange employeeArrange = new EmployeeArrange(data);
+        employeeArrange.BuildModel5();
+        Map resultMap = employeeArrange.solve();
+
+        Result result = null;
+        if(resultMap == null){
+            result = Result.fail("不能找到满足要求的方案");
+        }else{
+            int res[] = (int[]) resultMap.get("values");
+            for(int i = 0;i < res.length;i++){
+                System.out.println("res[i] = " + res[i]);
+            }
+            result = Result.success(resultMap);
+        }
+        return result;
     }
 }

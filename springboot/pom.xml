@@ -23,13 +23,6 @@
             <artifactId>cplex-12.6.3.0</artifactId>
             <version>12.6.3.0</version>
         </dependency>
-        <!--<dependency>-->
-        <!--    <groupId>logistics.cplex</groupId>  &lt;!&ndash;自定义&ndash;&gt;-->
-        <!--    <artifactId>cplex-12.6.0.1</artifactId>    &lt;!&ndash;自定义&ndash;&gt;-->
-        <!--    <version>12.6.0.1-SNAPSHOT</version> &lt;!&ndash;自定义&ndash;&gt;-->
-        <!--    <scope>system</scope> &lt;!&ndash;system，类似provided，需要显式提供依赖的jar以后，Maven就不会在Repository中查找它&ndash;&gt;-->
-        <!--    <systemPath>D:/Cplex12.6.3/duplicateDir/cplex/lib/cplex.jar</systemPath> &lt;!&ndash;项目根目录下的lib文件夹下&ndash;&gt;-->
-        <!--</dependency>-->
 
         <!--hutool工具-->
         <dependency>

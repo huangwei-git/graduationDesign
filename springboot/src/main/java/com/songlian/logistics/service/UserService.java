@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.User;
+import ilog.concert.IloException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 /**
  * <p>
@@ -27,4 +29,6 @@ public interface UserService extends IService<User> {
     public Result userCountData();
 
     public Result userSexCount();
+
+    public Result empArrange(HashMap map) throws IloException;
 }

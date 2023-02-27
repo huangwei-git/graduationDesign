@@ -8,11 +8,10 @@ import LocationInfo from "../views/inventory/LocationInfo.vue"
 import MaterialCount from "../views/material/MaterialCount.vue"
 import MaterialInfo from "../views/material/materialInfo.vue"
 import StoreInfo from "../views/inventory/StoreInfo";
-import MaterialEcharts from "../views/material/MaterialEcharts";
-import AddOrder from "../views/order/AddOrder";
 import OrderList from "../views/order/OrderList";
 import OrderDetailList from "../views/order/OrderDetailList";
 import LocationEcharts from "../views/inventory/LocationEcharts";
+import EmpArrange from "../views/calculate/EmpArrange";
 
 export default new VueRouter({
     routes:[
@@ -33,7 +32,7 @@ export default new VueRouter({
                 },
                 {
                     path:'locationInfo',
-                    component:LocationInfo,
+                    component:LocationInfo
                 },
                 {
                     path:'materialInfo',
@@ -58,6 +57,10 @@ export default new VueRouter({
                 {
                     path:"locationEcharts",
                     component:LocationEcharts
+                },
+                {
+                    path:'empArrange',
+                    component:EmpArrange
                 }
             ]
         },

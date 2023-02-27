@@ -10,6 +10,7 @@ import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.User;
 import com.songlian.logistics.service.UserService;
+import ilog.concert.IloException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -121,6 +122,18 @@ public class UserController {
             months[x - 1]++;
         });
         return Result.success(months);
+    }
+
+    @PostMapping("empArrange")
+    public Result employeeArrange(@RequestBody HashMap map){
+        System.out.println("map = " + map);
+        System.out.println("map.get(\"people\") = " + map.get("people"));
+        System.out.println("map.get(\"salary\") = " + map.get("salary"));
+        try {
+            return userService.empArrange(map);
+        } catch (IloException e) {
+            return Result.fail("求解失败");
+        }
     }
 }
 
