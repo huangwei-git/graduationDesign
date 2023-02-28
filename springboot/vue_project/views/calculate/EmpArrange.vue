@@ -2,9 +2,35 @@
   <div id="root">
 
     <el-button type="warning" @click="genRandomPeople">生成随机人数</el-button>
-    <el-button type="warning" @click="genRandomSalary">生成随机费用</el-button>
-    <el-button type="info" @click="clearFormData">清空</el-button>
-    <el-button type="primary" @click="submitForm">提交</el-button>
+    <el-button type="warning" @click="genRandomSalary" style="margin-left: 5px">生成随机费用</el-button>
+
+    <el-popover
+        placement="bottom"
+        width="320px"
+        trigger="click"
+        style="margin-left: 5px">
+      <div>
+        <span>随机人数均值</span>
+        <el-input-number v-model="peopleAverage" :min="50" :max="500" :step="10"></el-input-number>
+      </div>
+      <div>
+        <span>随机人数标准差</span>
+        <el-input-number v-model="peopleRange" :min="0" :max="500" :step="5"></el-input-number>
+      </div>
+      <el-divider></el-divider>
+      <div>
+        <span>随机费用均值</span>
+        <el-input-number v-model="salaryAverage" :min="20" :max="1000" :step="5"></el-input-number>
+      </div>
+      <div>
+        <span>随机费用标准差</span>
+        <el-input-number v-model="salaryrange"  :min="0" :max="500" :step="5"></el-input-number>
+      </div>
+      <el-button type="warning" slot="reference">随机数配置</el-button>
+    </el-popover>
+
+    <el-button type="info" @click="clearFormData" style="margin-left: 5px">清空</el-button>
+    <el-button type="primary" @click="submitForm" style="margin-left: 5px">提交</el-button>
 
     <div style="display: flex;justify-content: center;margin-top: 20px">
       <el-card class="box-card" style="text-align: center;width: 65%">
@@ -15,10 +41,10 @@
 
             <el-popover
                 style="float: right; padding: 0px 0"
-                placement="bottom"
+                placement="top"
                 width="200"
-                trigger="hover">
-              <el-input-number v-model="rangeMaxValue"></el-input-number>
+                trigger="click">
+              <el-input-number :min="100" :max="1000" :step="100" v-model="rangeMaxValue"></el-input-number>
               <el-button slot="reference" type="text">范围最大值</el-button>
             </el-popover>
 
@@ -67,6 +93,10 @@
           </el-form-item>
         </el-form>
       </el-card>
+
+      <div>
+        <RandomDataCharts/>
+      </div>
     </div>
 
     <div align="center" v-show="solution[0].objValue != ''">
@@ -86,20 +116,24 @@
         </el-table-column>
         <el-table-column label="最小所需费用" prop="objValue"></el-table-column>
       </el-table>
+
+      <ArrangeCharts/>
     </div>
+
+
+    
 
   </div>
 </template>
 
 <script>
-
-let item = {need:'',salary:''};
+import RandomDataCharts from "./RandomDataCharts";
+import ArrangeCharts from "./ArrangeCharts";
 
 export default {
   name: "EmpArrange",
   data(){
     return {
-      //form:{params:Array(12).fill(item)},
       formData:{people:Array(12).fill(''),salary:Array(12).fill(''),workTime:8,rangeValue:[10,100],min:false,max:false},
       timeStep:[
           {label:'00:00-02:00'},
@@ -115,10 +149,6 @@ export default {
           {label:'20:00-22:00'},
           {label:'22:00-00:00'},
       ],
-      randomRange:{
-        people:[[40,100],[40,100],[60,120],[60,120],[120,180],[180,240],[200,260],[200,260],[180,260],[120,180],[60,120],[40,100]],
-        salary:[[100,150],[100,150],[100,150],[100,150],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120],[75,120]]
-      },
       solution:[{values:[],objValue:''}],
       fieldMap:[
         {label:'00:00'},
@@ -135,14 +165,19 @@ export default {
         {label:'22:00'},
     ],
       rangeMaxValue:200,
+      peopleAverage:150,
+      peopleRange:70,
+      salaryAverage:60,
+      salaryrange:30,
     }
   },
   methods:{
-    genRandomPeople(){
-      this.formData.people = this.genRandomArray(this.randomRange.people);
+    genRandomPeople() {
+      this.formData.people = this.GenNormalDistributionData(this.peopleAverage,this.peopleRange,true);
     },
     genRandomSalary(){
-      this.formData.salary = this.genRandomArray(this.randomRange.salary);
+      this.formData.salary = this.GenNormalDistributionData(this.salaryAverage,this.salaryrange,false);
+
     },
     clearFormData(){
       this.formData.people = Array(12).fill('');
@@ -154,31 +189,88 @@ export default {
       this.rangeMaxValue = 200;
       this.solution = [{values:[],objValue:''}];
     },
-    genRandomArray(range){
-      let arr = Array(12);
-      for(let i = 0;i < 12;i++) {
-        let rand = -1;
-          rand = Math.random() * (range[i][1] - range[i][0] + 1) + range[i][1];
-        arr[i] = Math.floor(rand);
-      }
-      return arr;
-    },
     submitForm(){
       this.$axios.post(this.$httpUrl + "/user/empArrange",this.formData)
-          .then(res => res.data)
-          .then(res => {
-            if(res.code == 200){
-              this.solution[0].values = res.data.values;
-              this.solution[0].objValue = res.data.objValue;
-            }else{
-              alert(res.msg);
-            }
-          })
+      .then(res => res.data)
+      .then(res => {
+        if(res.code == 200){
+          this.solution[0].values = res.data.values;
+          this.solution[0].objValue = res.data.objValue;
+        }else{
+          alert(res.msg);
+        }
+      })
+    },
+    // Box-Muller法:获得正态分布随机数
+    //  average为均值，range为标准差
+    getNumberInNormalDistribution(average, range){
+      return average + (this.randomNormalDistribution() * range);
+    },
+    randomNormalDistribution(){
+      var u=0.0, v=0.0, w=0.0, c=0.0;
+      do{
+        //获得两个（-1,1）的独立随机变量
+        u=Math.random()*2-1.0;
+        v=Math.random()*2-1.0;
+        w=u*u+v*v;
+      }while(w==0.0||w>=1.0)
+      // Box-Muller转换
+      c = Math.sqrt((-2 * Math.log(w)) / w);
+      //返回2个标准正态分布的随机数，封装进一个数组返回
+      //当然，因为这个函数运行较快，也可以扔掉一个
+      //return [u*c,v*c];
+      return u * c;
+    },
+    GenNormalDistributionData(average,range,enableSort) {
+      let arrLeft = Array(6);
+      let arrRight = Array(6);
+      const round = Math.round;
+      for (let i = 0; i < 6; i++) {
+        arrLeft[i] = -1;
+        while(arrLeft[i] <= 0){
+          arrLeft[i] = Math.round(this.getNumberInNormalDistribution(average, range));
+        }
+      }
+      for (let i = 0; i < 6; i++) {
+        arrRight[i] = -1;
+        while(arrRight[i] <= 0){
+          arrRight[i] = Math.round(this.getNumberInNormalDistribution(average, range));
+        }
+      }
+      if(enableSort){
+        arrLeft = arrLeft.sort((a,b) => a - b);
+        arrRight = arrRight.sort((a,b) => b - a);
+      }
+      let arr = Array().concat(arrLeft,arrRight);
+      console.log(arr);
+      return arr;
     }
+  },
+  watch:{
+    "formData.people":{
+      handler(n,o){this.$bus.$emit("genRandomPeople",this.formData.people);}
+    },
+    "formData.salary":{
+      handler(n,o){this.$bus.$emit("genRandomSalary",this.formData.salary);}
+    },
+    'solution':{
+      deep:true,
+      handler(n,o){this.$bus.$emit("genRandomArrange",this.solution[0].values);}
+    }
+  },
+  components:{
+    RandomDataCharts,
+    ArrangeCharts
   }
 }
 </script>
 
 <style scoped>
-
+.el-popover div span{
+  display: inline-block;
+  height: 38px;
+  line-height: 38px;
+  width: 110px;
+  margin: 5px 0;
+}
 </style>

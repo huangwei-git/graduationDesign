@@ -116,7 +116,6 @@ export default {
       this.$axios.post(this.$httpUrl+'/orderDetail/listPage',this.pageData)
           .then(res => res.data)
           .then(res => {
-            console.log(res.data);
             this.loading = true;
             this.pageData.totalPage = res.total;
             this.dataFormat(res);
@@ -152,6 +151,10 @@ export default {
       this.pageData.params.sortField = this.sortField;
       this.pageData.params.sortDirection = 'DESC';
       this.loadPost();
+    },
+    // 接收订单页面传来的订单号
+    receiveOrderId(orderId){
+      this.pageData.params.orderId = orderId;
     },
     //====分页查询====
     handleSizeChange(val) {
@@ -197,10 +200,18 @@ export default {
     }
   },
   beforeMount() {
-    this.$nextTick(()=>{
-      this.loadPost();
-    })
+      let getOrderId = sessionStorage.getItem("orderId");
+      if(getOrderId != null){
+        this.searchOrderId = JSON.parse(sessionStorage.getItem("orderId"));
+        this.search();
+      }else{
+        this.loadPost();
+      }
   },
+  mounted() {
+    this.$bus.$on("clickOrderId",this.receiveOrderId)
+    this.loadPost();
+  }
 }
 </script>
 

@@ -52,14 +52,17 @@
           :cell-style="{ textAlign: 'center' }"
           :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
           style="margin-top: 10px;width: 80%"
-          @row-click="recordRowInfo"
-      >
+          @row-click="recordRowInfo">
 
         <el-table-column type="index" width="60%">
           <template slot="header" slot-scope="scope">序号</template>
         </el-table-column>
 
-        <el-table-column prop="orderId"  label="订单编号" width="200%"></el-table-column>
+        <el-table-column prop="orderId"  label="订单编号" width="200%">
+          <template slot-scope="scope">
+            <el-link @click="gotoDetailPage(scope.row.orderId)" :underline="false">{{scope.row.orderId}}</el-link>
+          </template>
+        </el-table-column>
         <el-table-column prop="materialName"  label="物品名称"></el-table-column>
         <el-table-column prop="amount"  label="数量"></el-table-column>
         <el-table-column prop="createTime"  label="创建时间" width="200%"></el-table-column>
@@ -71,7 +74,6 @@
 
       </el-table>
     </div>
-
 
     <!-- 分页 -->
     <div style="padding: 10px 0;text-align: center">
@@ -163,8 +165,13 @@ export default {
     recordRowInfo(row){
       this.clickedRow = row;
     },
+    // 跳转到详情页
+    gotoDetailPage(orderId){
+      this.$bus.$emit("clickOrderId",orderId);
+      sessionStorage.setItem("orderId",JSON.stringify(orderId));
+      this.$router.push("/orderDetailList");
+    },
     loadWhenSubmitOrder(msg){
-      console.log(msg);
       this.loadPost();
     },
   },

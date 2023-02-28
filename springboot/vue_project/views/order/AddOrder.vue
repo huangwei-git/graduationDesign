@@ -232,7 +232,6 @@ export default {
       this.mutex = index;
     },
     reloadPost(msg){
-      console.log(msg);
       this.loadPost();
     },
     handleClose(done) {
