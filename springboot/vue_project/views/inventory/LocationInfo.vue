@@ -11,13 +11,13 @@
             <el-option  label="地点ID" value="2"></el-option>
           </el-select>
         </el-input>
-        <el-form :model="searchPos" :rules="rules" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
+        <el-form :model="searchPos" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
           <el-form-item prop="xpos">
             <el-input v-model="searchPos.xpos" placeholder="x坐标" :maxlength="4"></el-input>
           </el-form-item>
         </el-form>
 
-        <el-form :model="searchPos" :rules="rules" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
+        <el-form :model="searchPos" ref="posForm" style="margin-left: 5px;width: 80px;display: inline-block;">
           <el-form-item prop="ypos">
             <el-input v-model="searchPos.ypos" placeholder="y坐标" :maxlength="4"></el-input>
           </el-form-item>
@@ -173,7 +173,7 @@ export default {
       if(res.code == 200){
         this.tableData = res.data;
       }else{
-        alert("获取数据失败");
+        this.tableData = [];
       }
       this.$nextTick(()=>{
         this.loading = false;
@@ -250,7 +250,7 @@ export default {
       this.form.type = row.type == 0?'运输中心':'需求地';
       this.centerDialogVisible = true;
     },
-    // 新增用户
+    // 新增地址
     saveForm(){
       this.$confirm('是否确认提交?', '提示', {
         confirmButtonText: '确定',
@@ -262,7 +262,7 @@ export default {
               .then(res => res.data)
               .then(res => {
                 if (res.code == 200) {
-
+                  this.$bus.$emit("updatePointInfo");
                   this.$notify({
                     title: '成功',
                     message: '添加成功',
@@ -306,6 +306,7 @@ export default {
             .then(res => res.data)
             .then(res => {
               if(res.code == 200){
+                this.$bus.$emit("updatePointInfo");
                 this.$notify({
                   title: '成功',
                   message: '添加成功',
@@ -458,12 +459,10 @@ export default {
         xpos:[
           { required: true, message: '请输入x坐标', trigger: 'blur' },
           { pattern: /^[0-9]*$/, message: '必须为数字' ,trigger:['blur','change']},
-          { min: 1, max: 4, message: '范围为1-9999', trigger: 'blur' }
         ],
         ypos:[
           { required: true, message: '请输入y坐标', trigger: 'blur' },
           { pattern: /^[0-9]*$/, message: '必须为数字' ,trigger:['blur','change']},
-          { min: 1, max: 4, message: '范围为1-9999', trigger: 'blur' }
         ],
         type:[
           { required: true, message: '请选择地点类型', trigger: 'blur' },
@@ -479,8 +478,10 @@ export default {
   watch:{
     centerDialogVisible:{
       handler(nval,oval){
-        if(nval == false)
+        if(nval == false){
           this.resetForm();
+        };
+        this.loadPost();
       }
     },
   },

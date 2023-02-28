@@ -7,6 +7,8 @@
         :visible.sync="dialogVisible"
         title="坐标地图"
         @open="open()"
+        @close="close()"
+        :close-on-press-escape="true"
         :fullscreen="true"
         :modal="false"
         center
@@ -17,7 +19,7 @@
           <el-button icon="el-icon-cpu" type="success" @click="calcDist = true;point={x:'',y:''}" style="margin-left: 0px">计算距离</el-button>
         </el-button-group>
 
-      <span style="position: absolute;right: 20px;line-height: 40px">
+      <span style="position: absolute;right: 20px;line-height: 40px;margin-bottom: 10px">
         <el-tag :type="calcDist?'danger':'primary'" effect="dark" style="font-size: 16px">{{msg}}</el-tag>
       </span>
     </div>
@@ -33,7 +35,7 @@
 
 <script>
 import * as echarts from 'echarts';
-var locationOption;
+var locationChartDom;
 var locationChart;
 
 export default {
@@ -54,17 +56,57 @@ export default {
           .then(res => res.data)
           .then(res => {
             this.dataFormat(res);
+          });
+    },
+    loadLocation(){
+      this.$axios.get(this.$httpUrl + "/location")
+          .then(res => res.data)
+          .then(res => {
+            this.transportPointsData = [];
+            this.demandPointsData = [];
+            let cnt = 0;
+            for(let i = 0;i < res.total;i++){
+              let item = {
+                'name':res.data[i].name,
+                'x':res.data[i].xpos,
+                'y':res.data[i].ypos,
+                locId:res.data[i].locId,
+              };
+              if(res.data[i].type == 0) this.transportPointsData.push(item);
+              else{
+                this.demandPointsData.push(item);
+              }
+            }
+            this.totalDemands = this.demandPointsData.length;
+            //locationOption.series[0].data = this.transportPointsData;
+            //locationOption.series[1].data = this.demandPointsData;
           })
     },
+    open(){
+      this.$nextTick(() => {
+        //  执行echarts方法
+        this.initEcharts()
+      })
+    },
     initEcharts(){
-      var locationChartDom = document.getElementById('graph');
-      //var locationChart = echarts.init(locationChartDom);
+      locationChartDom = document.getElementById('graph');
       locationChart = echarts.init(locationChartDom);
-
+      var locationOption;
 
       locationOption = {
         title: {
           text: '运输中心与需求地的位置关系图',
+        },
+        tooltip: {
+          trigger:'item',
+          formatter: function (params) {
+            return (
+                '(' +
+                params.data.x +
+                ', ' +
+                params.data.y + ')'
+            );
+          }
         },
         animationDurationUpdate: 1500,
         animationEasingUpdate: 'quinticInOut',
@@ -88,7 +130,7 @@ export default {
             edgeLabel: {
               fontSize: 20
             },
-            data: [],
+            data: this.transportPointsData,
             lineStyle: {
               opacity: 0.9,
               width: 2,
@@ -113,7 +155,7 @@ export default {
             edgeLabel: {
               fontSize: 20
             },
-            data: [],
+            data: this.demandPointsData,
             lineStyle: {
               opacity: 0.9,
               width: 2,
@@ -122,43 +164,20 @@ export default {
           },
         ]
       };
-
-      this.$axios.get(this.$httpUrl + "/location")
-          .then(res => res.data)
-          .then(res => {
-            console.log(res.data);
-            let cnt = 0;
-            for(let i = 0;i < res.total;i++){
-              let item = {
-                'name':res.data[i].name,
-                'x':res.data[i].xpos,
-                'y':res.data[i].ypos,
-                locId:res.data[i].locId,
-              };
-              if(res.data[i].type == 0) this.transportPointsData.push(item);
-              else{
-                this.demandPointsData.push(item);
-              }
-            }
-            this.totalDemands = this.demandPointsData.length;
-            locationOption.series[0].data = this.transportPointsData;
-            locationOption.series[1].data = this.demandPointsData;
-          }).then(() => {
-        console.log(this.demandPointsData)
-        locationOption && locationChart.setOption(locationOption);
-      })
+        if(this.firstLoad){
+          locationOption && locationChart.setOption(locationOption);
+          this.firstLoad = false;
+        }
 
       locationChart.on('click',(query)=>{
         this.point = {name:query.name,x:query.data.x , y:query.data.y}
         if(!this.calcDist) this.msg = this.point.name + "：("+ this.point.x + ', ' + this.point.y + ')';
       })
+
+
     },
-    open(){
-      this.$nextTick(() => {
-        //  执行echarts方法
-        this.initEcharts()
-      })
-    }
+    close(){
+    },
   },
   data() {
       return {
@@ -171,7 +190,8 @@ export default {
           x: '',
           y: ''
         },
-        calcDist: false,
+        calcDist: true,
+        firstLoad:true,
         msg: '点击图中的位置',
       }
   },
@@ -189,8 +209,13 @@ export default {
       }
     },
   },
-  mounted() {
+  beforeMount() {
+    this.loadPost();
+    this.loadLocation();
 
+  },
+  mounted() {
+    this.$bus.$on("updatePointInfo",this.loadLocation);
   },
 }
 </script>
