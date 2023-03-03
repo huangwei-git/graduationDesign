@@ -1,7 +1,6 @@
 package com.songlian.logistics;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.songlian.logistics.calculate.TSP.TspSolution;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.*;

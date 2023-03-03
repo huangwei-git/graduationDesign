@@ -1,6 +1,6 @@
 package com.songlian.logistics.calculate.Transport;
 
-import com.songlian.logistics.calculate.TSP.TspSolution;
+import com.songlian.logistics.calculate.DP_TSP.TspSolution;
 
 import java.util.HashMap;
 import java.util.LinkedList;

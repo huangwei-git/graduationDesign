@@ -1,4 +1,4 @@
-package com.songlian.logistics.calculate.LP;
+package com.songlian.logistics.calculate.IP_EmpArrange;
 
 public class LpData{
     // 目标系数

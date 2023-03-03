@@ -111,7 +111,8 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         }
 
         TransportionSolution transportionSolution = new TransportionSolution(supplier,demander,cost,true);
-        //transportionSolution.setOpenProcessPrint(true);
+        // 控制台输出优化调整过程
+        transportionSolution.setOpenProcessPrint(true);
         //System.out.println(transportionSolution.getRecordPlan().size());
         transportionSolution.Run();
 

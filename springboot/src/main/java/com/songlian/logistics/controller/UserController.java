@@ -6,6 +6,7 @@ import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.songlian.logistics.common.Constants;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.User;
@@ -88,7 +89,12 @@ public class UserController {
 
     @PostMapping("/listPage")
     public Result listByPage(@RequestBody QueryPageParam query) {
-        return userService.pageList(query);
+        try {
+            return userService.pageList(query);
+        }catch (Exception e){
+            System.out.println("UserController.listByPage : " + e);
+            return Result.error(Constants.CODE_500,"服务器异常，请稍后重试");
+        }
     }
 
     // 删除
