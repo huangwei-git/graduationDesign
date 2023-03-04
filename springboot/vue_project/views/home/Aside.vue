@@ -54,6 +54,7 @@
         <span slot="title">资源配置</span>
       </template>
         <el-menu-item index="/empArrange"><span>员工安排</span></el-menu-item>
+        <el-menu-item index="/addPointsData"><span>路线安排</span></el-menu-item>
     </el-submenu>
 
   </el-menu>

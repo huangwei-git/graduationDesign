@@ -11,8 +11,9 @@ import StoreInfo from "../views/inventory/StoreInfo";
 import OrderList from "../views/order/OrderList";
 import OrderDetailList from "../views/order/OrderDetailList";
 import LocationEcharts from "../views/inventory/LocationEcharts";
-import EmpArrange from "../views/calculate/EmpArrange";
+import EmpArrange from "../views/empArrange/EmpArrange";
 import PersonalHomepage from "../views/personalPage/PersonalHomepage";
+import AddPointsData from "../views/TspCompute/AddPointsData";
 
 export default new VueRouter({
     routes:[
@@ -66,7 +67,11 @@ export default new VueRouter({
                 {
                     path:'personalPage',
                     component:PersonalHomepage
-                }
+                },
+                {
+                    path:'addPointsData',
+                    component:AddPointsData
+                },
             ]
         },
         {
