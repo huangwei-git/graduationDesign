@@ -58,7 +58,7 @@
           </el-select>
 
           <el-button type="primary" @click="createDialogVisible = true;displayDialogVisible = false;isFormChanged=false" style="margin-left: 10px">上一步</el-button>
-          <el-button type="danger" @click="createOrder">创建订单</el-button>
+          <el-button type="danger" @click="createAppointOrder">创建订单</el-button>
 
         </div>
       </div>
@@ -212,6 +212,7 @@ export default {
       if(this.selectedMaterial.count - sum < 0){
         this.$message.error("超出库存数量！");
       }else{
+        console.log(need);
         this.$axios.post(this.$httpUrl + "/order/compute",{need:need,locId:locId,mid:this.selectedMaterial.mid})
             .then(res => res.data)
             .then(res => {
@@ -255,6 +256,7 @@ export default {
             .then(res => res.data)
             .then(res => {
               console.log("tsp result: ",res);
+              this.orderKey = res.data.key;
               this.pathPoints = res.data.points;
               // 遗传算法
               this.GAtsp.min = res.data.GAmin.toFixed(3);
@@ -282,6 +284,7 @@ export default {
         })
       }
     },
+    // 创建自动分配的订单
     createOrder(){
       this.$axios.post(this.$httpUrl + "/order/genOrderFromBuffer",{state:1,key:this.orderKey,mid:this.selectedMaterial.mid,amount:this.selectedMaterial.count})
           .then(res => res.data)
@@ -300,6 +303,31 @@ export default {
             this.initSelect();
       }).then(()=>{
           this.$bus.$emit('submitOrder',"成功创建！");
+      })
+    },
+    // 创建指派订单
+    createAppointOrder(){
+      let selectedCount = 0;
+      for(let i = 0;i < this.formData.num.length;i++){
+        selectedCount += this.formData.num[i];
+      }
+      this.$axios.post(this.$httpUrl + "/order/appointDistributionOrderBuffer",{key:this.orderKey,mid:this.selectedMaterial.mid,amount:selectedCount,tspMethod:this.selectTspMethod})
+          .then(res => res.data)
+          .then(res => {
+            if(res.code == 200){
+              this.$notify({
+                title:'订单创建成功',
+                message:'订单号：'+res.data.id,
+                type:'success'
+              })
+            }else{
+              this.$notify.error("订单创建失败")
+            }//else
+          }).then(()=>{
+        this.displayDialogVisible = false;
+        this.initSelect();
+      }).then(()=>{
+        this.$bus.$emit('submitOrder',"成功创建！");
       })
     },
     initSelect(){

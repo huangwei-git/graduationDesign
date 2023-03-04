@@ -2,20 +2,19 @@ package com.songlian.logistics.controller;
 
 
 import cn.hutool.db.sql.Order;
-import cn.hutool.json.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.songlian.logistics.common.Constants;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
+import com.songlian.logistics.exception.RequestExpcetion;
 import com.songlian.logistics.pojo.OrderForm;
 import com.songlian.logistics.service.OrderDetailService;
 import com.songlian.logistics.service.OrderFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -51,7 +50,7 @@ public class OrderFormController {
     }
 
     @PostMapping("/genOrderFromBuffer")
-    public Result genOrderFromBuffer(@RequestBody HashMap map) {
+    public Result genAutoDistributionOrderFromBuffer(@RequestBody HashMap map) {
         if((Integer)map.get("state") == 0){
             return Result.success();
         }else{
@@ -64,13 +63,42 @@ public class OrderFormController {
             orderForm.setAmount(amount);
             orderForm.setMaterialId(mid);
             orderFormService.save(orderForm);
-            LambdaQueryWrapper<OrderForm> lqw = new LambdaQueryWrapper<>();
-            lqw.eq(OrderForm::getAmount,amount);
-            lqw.eq(OrderForm::getMaterialId,mid);
-            Long id = orderFormService.list(lqw).get(0).getOrderId();
+            //LambdaQueryWrapper<OrderForm> lqw = new LambdaQueryWrapper<>();
+            //lqw.eq(OrderForm::getAmount,amount);
+            //lqw.eq(OrderForm::getMaterialId,mid);
+            //Long id = orderFormService.list(lqw).get(0).getOrderId();
+            Long id = orderForm.getOrderId();
             return orderDetailService.createOrderDetail(id,mid,orderFormService.getOrderBuffer((String) map.get("key")));
         }
     }
 
+    @PostMapping("/appointDistributionOrderBuffer")
+    public Result genAppointDistributionOrderFromBuffer(@RequestBody Map map) {
+        // 创建一个订单页面实例
+        OrderForm orderForm = new OrderForm();
+        Integer mid = null;
+        Integer amount = null;
+        String TspMethod = null;
+        // 获取物品ID、物品数量
+        try {
+            mid = (Integer) map.get("mid");
+            amount = (Integer) map.get("amount");
+            TspMethod = (String) map.get("tspMethod");
+        }catch (Exception e){
+            return Result.fail("客户端传回的参数错误！");
+        }
+        // 设置实例属性
+        orderForm.setMaterialId(mid);
+        orderForm.setAmount(amount);
+        try {
+            return orderDetailService.createOrderDetailByAppoint(TspMethod,orderForm, orderFormService.getOrderBuffer((String) map.get("key")));
+        }catch (RequestExpcetion re){
+            System.out.println("客户端参数异常！ ： " + re);
+            return Result.fail(re.getMessage());
+        }catch (Exception e){
+            System.out.println("添加订单失败！ ： " + e);
+            return Result.fail("服务器异常，请稍后重试");
+        }
+    }
 }
 

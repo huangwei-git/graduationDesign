@@ -1,8 +1,6 @@
 package com.songlian.logistics.service.impl;
 
-import cn.hutool.core.lang.hash.Hash;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.songlian.logistics.calculate.ACO_TSP.ACO_TSP;
 import com.songlian.logistics.calculate.EchartsDataTransfer.GraphDataTransfer;
@@ -16,7 +14,9 @@ import com.songlian.logistics.calculate.TspData;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.OrderFormDao;
-import com.songlian.logistics.pojo.*;
+import com.songlian.logistics.pojo.Inventory;
+import com.songlian.logistics.pojo.Location;
+import com.songlian.logistics.pojo.OrderForm;
 import com.songlian.logistics.service.InventoryService;
 import com.songlian.logistics.service.LocationService;
 import com.songlian.logistics.service.OrderFormService;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -133,13 +132,6 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
 
         int[][] plan = transportionSolution.getPlanTab();
         System.out.println("total = " + transportionSolution.getTotal());
-        /* 输出最终运输方案 */
-        //for(int i = 0;i < supplier.length;i++){
-        //    for(int j = 0;j < demander.length;j++){
-        //        System.out.print(plan[i][j] + "  ");
-        //    }
-        //    System.out.println();
-        //}
 
         // 获取各个运输中心的配送信息
 
@@ -177,7 +169,7 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
             requireMap.put("sendLocName",supplierLocationList.get(i).getName());
             requireMap.put("storeNum",supplier[i]);
             for (int j = 0; j < demander.length; j++) {
-                if(demander[j] == 0) break;
+                if(demander[j] == 0) continue;
                 if(plan[i][j]!=0){
                     tolls[j] += plan[i][j] * cost[i][j];
                     cnt++;
@@ -294,7 +286,7 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         Integer locId = (Integer) map.get("locId");
         // 获得材料ID
         Integer materialId = (Integer) map.get("mid");
-        // 获取 {需求量id 与 需求量} 数组
+        // 获取 {需求地id 与 需求量} 数组
         ArrayList<Map> needList = (ArrayList<Map>) map.get("need");
         // 获得需要配送的需求地
         List<Location> locations = new ArrayList<>();
@@ -431,7 +423,7 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
                 for (int j = 0; j < colLen; j++) {
                     if(demanders[j] == 0){
                         isEmpty=true;
-                        break;
+                        continue;
                     }
                     if(plan[i][j] != 0){
                         toll[j] += plan[i][j] * cost[i][j];

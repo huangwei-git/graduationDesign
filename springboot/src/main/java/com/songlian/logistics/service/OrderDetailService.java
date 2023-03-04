@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.OrderDetail;
+import com.songlian.logistics.pojo.OrderForm;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,9 @@ import java.util.List;
  */
 public interface OrderDetailService extends IService<OrderDetail> {
 
-    public Result createOrderDetail(Long id,int materialId, List<HashMap> list);
+    public Result createOrderDetail(Long id, int materialId, List<HashMap> list);
+
+    public Result createOrderDetailByAppoint(String tspMethod, OrderForm orderForm, List<HashMap> list);
 
     public Result pageList(QueryPageParam query);
 }
