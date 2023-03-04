@@ -21,5 +21,7 @@ public interface OrderFormService extends IService<OrderForm> {
 
     public Result genOrder(HashMap map);
 
+    public Result genOrderOfTsp(HashMap map);
+
     public List<HashMap> getOrderBuffer(String key);
 }

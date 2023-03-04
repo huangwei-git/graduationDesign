@@ -1,5 +1,7 @@
 package com.songlian.logistics.calculate.TabuSearch_TSP;
 
+import com.songlian.logistics.calculate.TspData;
+
 import java.util.*;
 
 /*  禁忌搜索算法
@@ -10,11 +12,11 @@ import java.util.*;
 
 public class TS_TSP {
     // 最大的迭代次数(提高这个值可以稳定地提高解质量，但是会增加求解时间)
-    public final int MAX_GEN = 100000;
+    public final int MAX_GEN = 5000;
     // 每次搜索领域的个数(这个值不要太大，太大的话搜索效率会降低)
-    public final int N = 100;
+    public final int N = 30;
     // 禁忌长度
-    public final int len = 20;
+    public int len = 20;
     // 城市数量，手动设置
     public int cityNum;
     // 禁忌表
@@ -47,18 +49,22 @@ public class TS_TSP {
     public int l = 0;
 
     // 构造函数
-    public TS_TSP(List<double[]> pointList) {
+    public TS_TSP(List<double[]> pointList,double[][] dist) {
         this.pointList = pointList;
+        int listLen = pointList.size();
+        int maxSize = (listLen * (listLen - 1)) >> 1;
+        if(len >= maxSize) len  = maxSize - 1;
+        this.dist = dist;
     }
 
     // 外部调用接口
-    public void solve() throws Exception {
+    public TspData solve() throws Exception {
         initVar();
-        tabuSearch();
+        return slover();
     }
 
     // 禁忌搜索主函数
-    public void tabuSearch() {
+    public TspData slover() {
         // 开始迭代，停止条件为达到指定迭代次数
         while (t <= MAX_GEN) {
             // 当前领域搜索次数
@@ -93,12 +99,16 @@ public class TS_TSP {
             t++;
         }
         // 输出结果
-        System.out.println("最佳迭代次数:"+bestT);
-        System.out.println("最短路程为："+bestEvaluation);
+        //System.out.println("最佳迭代次数:"+bestT);
+        //System.out.println("最短路程为："+bestEvaluation);
         int[] bestPath = new int[cityNum+1];
         System.arraycopy(bestGh, 0, bestPath, 0, bestGh.length);
         bestPath[cityNum] = bestPath[0];
-        System.out.println("最佳路径为："+ Arrays.toString(bestPath));
+        //System.out.println("最佳路径为："+ Arrays.toString(bestPath));
+
+        // 包装返回结果
+        TspData tspData = new TspData(bestEvaluation, Arrays.toString(bestPath));
+        return tspData;
     }
 
     // 加入禁忌队列
@@ -170,7 +180,7 @@ public class TS_TSP {
                 }
             }
         }
-        System.out.println("初始解：" + Arrays.toString(Ghh));
+        //System.out.println("初始解：" + Arrays.toString(Ghh));
         return Ghh.clone();
     }
 
@@ -190,20 +200,23 @@ public class TS_TSP {
         bestGh = new int[cityNum];//最好的路径编码
         LocalGh = new int[cityNum];//当前最好路径编码
         tempGh = new int[cityNum];//存放临时编码
-        dist = new double[cityNum][cityNum];//距离矩阵
+        //dist = new double[cityNum][cityNum];//距离矩阵
         // 初始化距离矩阵
         for (int i = 0; i < dist.length; i++) {
             for (int j = i; j < dist[i].length; j++) {
                 if (i == j) {
                     // 对角线为0
                     dist[i][j] = 0.0;
-                } else {
-                    // 计算i到j的距离和j到i的距离
-                    dist[i][j] = getDistance(pointList.get(i), pointList.get(j));
-                    dist[j][i] = dist[i][j];
+                    break;
                 }
+                //else {
+                //    // 计算i到j的距离和j到i的距离
+                //    dist[i][j] = getDistance(pointList.get(i), pointList.get(j));
+                //    dist[j][i] = dist[i][j];
+                //}
             }
         }
+
         // 初始化参数
         bestT = 0;
         t = 0;

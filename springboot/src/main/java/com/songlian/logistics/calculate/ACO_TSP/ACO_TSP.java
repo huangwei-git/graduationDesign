@@ -1,5 +1,6 @@
 package com.songlian.logistics.calculate.ACO_TSP;
 
+import com.songlian.logistics.calculate.TspData;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public class ACO_TSP {
     public int cityNum; // 城市数量
     public int MAX_GEN = 500; // 运行代数
     public double[][] pheromone; // 信息素矩阵
-    public double[][] distance; // 距离矩阵
+    public double[][] dist; // 距离矩阵
     public double bestLength; // 最佳长度
     public int[] bestTour; // 最佳路径
     public int bestT; //最佳迭代数
@@ -27,20 +28,21 @@ public class ACO_TSP {
     private double rho = 0.5; //信息素挥发速率
 
     //构造函数
-    public ACO_TSP(List<double[]> locationList) {
+    public ACO_TSP(List<double[]> locationList,double dist[][]) {
         this.locationList = locationList;
         cityNum = locationList.size();
         ants = new Ant[antNum];
+        this.dist = dist;
     }
 
     //外部调用窗口
-    public void solve() {
+    public TspData solve() {
         initVar();
-        solver();
+        return solver();
     }
 
     //
-    public void solver() {
+    public TspData solver() {
         // 迭代MAX_GEN次
         for (int g = 0; g < MAX_GEN; g++) {
             // antNum只蚂蚁
@@ -75,32 +77,38 @@ public class ACO_TSP {
             updatePheromone();
             // 重新初始化蚂蚁
             for (int i = 0; i < antNum; i++) {
-                ants[i].initAnt(distance, alpha, beta);
+                ants[i].initAnt(dist, alpha, beta);
             }
         }
         // 输出结果
-        System.out.println("最佳迭代次数:" + bestT);
-        System.out.println("最短路程为：" + bestLength);
+        //System.out.println("最佳迭代次数:" + bestT);
+        //System.out.println("最短路程为：" + bestLength);
         int[] bestPath = new int[cityNum + 1];
         System.arraycopy(bestTour, 0, bestPath, 0, bestTour.length);
         bestPath[cityNum] = bestPath[0];
-        System.out.println("最佳路径为：" + Arrays.toString(bestPath));
+        //System.out.println("最佳路径为：" + Arrays.toString(bestPath));
+
+        // 包装返回结果
+        //TspData tspData = new TspData(bestLength, bestPath.toString());
+        TspData tspData = new TspData(bestLength, Arrays.toString(bestPath));
+        return tspData;
     }
 
     //初始化
     public void initVar() {
         //初始化距离矩阵
-        distance = new double[cityNum][cityNum];
-        for (int i = 0; i < cityNum; i++) {
-            for (int j = i; j < cityNum; j++) {
-                if (i == j) {
-                    distance[i][j] = 0.0;
-                } else {
-                    distance[i][j] = getDistance(locationList.get(i), locationList.get(j));
-                    distance[j][i] = distance[i][j];
-                }
-            }
-        }
+        //dist = new double[cityNum][cityNum];
+        //for (int i = 0; i < cityNum; i++) {
+        //    for (int j = i; j < cityNum; j++) {
+        //        if (i == j) {
+        //            dist[i][j] = 0.0;
+        //        } else {
+        //            dist[i][j] = getDist(locationList.get(i), locationList.get(j));
+        //            dist[j][i] = dist[i][j];
+        //        }
+        //    }
+        //}
+
         //初始化信息素矩阵
         pheromone = new double[cityNum][cityNum];
         for (int i = 0; i < cityNum; i++) {
@@ -113,7 +121,7 @@ public class ACO_TSP {
         // 放置蚂蚁
         for (int i = 0; i < antNum; i++) {
             ants[i] = new Ant(cityNum);
-            ants[i].initAnt(distance, alpha, beta);
+            ants[i].initAnt(dist, alpha, beta);
         }
     }
 
@@ -136,7 +144,7 @@ public class ACO_TSP {
     }
 
     //计算两点之间的距离（如果使用伪欧氏距离，可以减少计算量）
-    public double getDistance(double[] place1, double[] place2) {
+    public double getDist(double[] place1, double[] place2) {
         //伪欧氏距离在根号内除以了一个10
         return Math.sqrt((Math.pow(place1[0]-place2[0],2)+Math.pow(place1[1]-place2[1],2))/10.0);
 //        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));

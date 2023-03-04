@@ -1,5 +1,6 @@
 package com.songlian.logistics.calculate.IP_TSP;
 
+import com.songlian.logistics.calculate.TspData;
 import ilog.concert.IloIntVar;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
@@ -12,22 +13,23 @@ public class IP_TSP {
     // 城市坐标<[x,y]>
     List<double[]> locationList;
     // 距离矩阵
-    double[][] distance;
+    double[][] dist;
     // 城市数量
     int cityNum;
     // 开始地点索引
     int startIndex;
 
-    public IP_TSP(List<double[]> locationList) {
+    public IP_TSP(List<double[]> locationList, double dist[][]) {
         this.locationList = locationList;
+        this.dist = dist;
     }
 
-    public void solve() {
+    public TspData solve() {
         initVar();
-        solver();
+        return solver();
     }
 
-    private void solver() {
+    private TspData solver() {
         try {
             IloCplex cplex = new IloCplex();
             //决策变量
@@ -44,7 +46,7 @@ public class IP_TSP {
             for (int i = 0; i < cityNum; i++) {
                 for (int j = 0; j < cityNum; j++) {
                     if (i != j) {
-                        target.addTerm(distance[i][j], intVars[i][j]);
+                        target.addTerm(dist[i][j], intVars[i][j]);
                     }
                 }
             }
@@ -96,14 +98,20 @@ public class IP_TSP {
                         break;
                     }
                 }
-                System.out.println("最短路径为：" + bestPath);
-                System.out.println("最短路径长度为：" + cplex.getObjValue());
+                // 输出结果
+                //System.out.println("最短路径为：" + bestPath);
+                //System.out.println("最短路径长度为：" + cplex.getObjValue());
+
+                // 包装返回结果
+                TspData tspData = new TspData(cplex.getObjValue(), bestPath.toString());
+                return tspData;
             } else {
                 System.err.println("此题无解");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     // 初始化变量
@@ -113,18 +121,20 @@ public class IP_TSP {
         // 城市数量为点的数量
         cityNum = locationList.size();
         // 距离矩阵
-        distance = new double[cityNum][cityNum];
+        /*dist = new double[cityNum][cityNum];*/
         // 初始化距离矩阵
-        for (int i = 0; i < distance.length; i++) {
-            for (int j = i; j < distance[i].length; j++) {
+        for (int i = 0; i < dist.length; i++) {
+            for (int j = i; j < dist[i].length; j++) {
                 if (i == j) {
                     // 对角线为无穷大
-                    distance[i][j] = Double.MAX_VALUE;
-                } else {
-                    // 计算i到j的距离
-                    distance[i][j] = getDistance(locationList.get(i), locationList.get(j));
-                    distance[j][i] = distance[i][j];
+                    dist[i][j] = Double.MAX_VALUE;
+                    break;
                 }
+                //else {
+                //    // 计算i到j的距离
+                //    dist[i][j] = getDistance(locationList.get(i), locationList.get(j));
+                //    dist[j][i] = dist[i][j];
+                //}
             }
         }
     }
@@ -132,8 +142,8 @@ public class IP_TSP {
     // 计算两点之间的距离（使用伪欧氏距离，可以减少计算量）
     public double getDistance(double[] place1, double[] place2) {
         // 伪欧氏距离在根号内除以了一个10
-//        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)) / 10.0);
-        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
+        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)) / 10.0);
+//        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
     }
 
 }

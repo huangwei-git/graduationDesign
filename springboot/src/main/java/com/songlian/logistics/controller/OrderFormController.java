@@ -40,9 +40,14 @@ public class OrderFormController {
         return orderFormService.pageList(query);
     }
 
-    @PostMapping("/comptude")
+    @PostMapping("/compute")
     public Result compute(@RequestBody HashMap map){
         return orderFormService.genOrder(map);
+    }
+
+    @PostMapping("/tsp")
+    public Result TSP(@RequestBody HashMap map){
+        return orderFormService.genOrderOfTsp(map);
     }
 
     @PostMapping("/genOrderFromBuffer")

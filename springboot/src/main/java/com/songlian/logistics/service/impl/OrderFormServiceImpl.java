@@ -4,9 +4,15 @@ import cn.hutool.core.lang.hash.Hash;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.songlian.logistics.calculate.ACO_TSP.ACO_TSP;
+import com.songlian.logistics.calculate.EchartsDataTransfer.GraphDataTransfer;
+import com.songlian.logistics.calculate.GA_TSP.GA_TSP;
+import com.songlian.logistics.calculate.IP_TSP.IP_TSP;
+import com.songlian.logistics.calculate.TabuSearch_TSP.TS_TSP;
 import com.songlian.logistics.calculate.Transport.Calc;
 import com.songlian.logistics.calculate.Transport.Path;
 import com.songlian.logistics.calculate.Transport.TransportionSolution;
+import com.songlian.logistics.calculate.TspData;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.dao.OrderFormDao;
@@ -19,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -276,6 +284,118 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         return Result.success(resMap,supplier.length);
     }
 
+    @Override
+    public Result genOrderOfTsp(HashMap map) {
+        // 缓存用于创建订单
+        List<HashMap> resultBuff = new ArrayList<>();
+        int amount = 0;
+
+        // 获得配送地ID
+        Integer locId = (Integer) map.get("locId");
+        // 获得材料ID
+        Integer materialId = (Integer) map.get("mid");
+        // 获取 {需求量id 与 需求量} 数组
+        ArrayList<Map> needList = (ArrayList<Map>) map.get("need");
+        // 获得需要配送的需求地
+        List<Location> locations = new ArrayList<>();
+        // 存储坐标的数组
+        double locationArray[][] = new double[needList.size() + 1][2];
+        // 获取运输中心的location对象
+        Location supplierLocation = locationService.getById(locId);
+        // 存储地名
+        List<String> locNameList = new ArrayList<>();
+        locationArray[0][0] = supplierLocation.getXpos();
+        locationArray[0][1] = supplierLocation.getYpos();
+        locNameList.add(supplierLocation.getName());
+        for (int i = 0; i < needList.size(); i++) {
+            amount = amount + (Integer) needList.get(i).get("amount");
+            Integer tmpLocId = (Integer) needList.get(i).get("locId");
+            Location tmpLocation = locationService.getById(tmpLocId);
+            locations.add(tmpLocation);
+            locationArray[i + 1][0] = tmpLocation.getXpos();
+            locationArray[i + 1][1] = tmpLocation.getYpos();
+            locNameList.add(tmpLocation.getName());
+        }
+
+        List<double[]> locList = new ArrayList<>();
+        Collections.addAll(locList,locationArray);
+        // 初始化距离
+        int cityNum = locList.size();
+        double dist[][] = new double[cityNum][cityNum];
+        for (int i = 0; i < cityNum; i++) {
+            for (int j = i; j < cityNum; j++) {
+                if (i != j) {
+                    dist[i][j] = getDistance(locList.get(i), locList.get(j));
+                    dist[j][i] = dist[i][j];
+                }
+            }
+        }
+
+        // 保存结果
+        Map result = new HashMap();
+        // 保存路径
+        String paths[] = new String[4];
+
+        //System.out.println("==========禁忌搜索算法==========");
+        try {
+            TspData TS_Data = new TS_TSP(locList, dist).solve();
+            result.put("TSmin",TS_Data.getMinLength());
+            paths[0] = TS_Data.getPath();
+            result.put("TSpath",GraphDataTransfer.graphLinkFormat(TS_Data.getPath()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        //System.out.println("==========蚁群算法==========");
+        TspData ACO_Data = new ACO_TSP(locList, dist).solve();
+        result.put("ACOmin",ACO_Data.getMinLength());
+        paths[1] = ACO_Data.getPath();
+        result.put("ACOpath",GraphDataTransfer.graphLinkFormat(ACO_Data.getPath()));
+
+        //System.out.println("==========遗传算法==========");
+        try {
+            TspData GA_Data = new GA_TSP(locList, dist).solve();
+            result.put("GAmin", GA_Data.getMinLength());
+            paths[2] = GA_Data.getPath();
+            result.put("GApath",GraphDataTransfer.graphLinkFormat(GA_Data.getPath()));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //System.out.println("==========数学规划==========");
+        TspData IP_Data = new IP_TSP(locList, dist).solve();
+        result.put("IPmin", IP_Data.getMinLength());
+        paths[3] = IP_Data.getPath();
+        result.put("IPpath",GraphDataTransfer.graphLinkFormat(IP_Data.getPath()));
+
+
+        result.put("points", GraphDataTransfer.graphDataFormat(locList,locNameList));
+
+
+        // 缓存结果
+        HashMap bufferMap = new HashMap();
+        // 运输地
+        bufferMap.put("locId", locId);
+        // 物品
+        bufferMap.put("mid",materialId);
+        // 总数
+        bufferMap.put("amount", amount);
+        // 距离矩阵
+        bufferMap.put("dist", dist);
+        // 需求地ID 和 需求量
+        bufferMap.put("needList", needList);
+        // 路径
+        bufferMap.put("paths",paths);
+        resultBuff.add(bufferMap);
+        // 将结果缓存并获得key
+        result.put("key",saveOrder(resultBuff));
+        return Result.success(result);
+    }
+
     // 将订单缓存，并返回一个key
     private String saveOrder(List<HashMap> orderDetail) {
         String key = LocalDateTime.now().toString();
@@ -331,6 +451,13 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
             res.add(list);
         }
         return res;
+    }
+
+    // 计算两点之间的距离（使用伪欧氏距离，可以减少计算量）
+    private double getDistance(double[] place1, double[] place2) {
+        // 伪欧氏距离在根号内除以了一个10
+        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)) / 10.0);
+//        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
     }
 
     private Integer s2i(String field, Integer errValue) {

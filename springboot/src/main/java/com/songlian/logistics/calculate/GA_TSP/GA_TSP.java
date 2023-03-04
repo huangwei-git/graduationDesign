@@ -1,5 +1,7 @@
 package com.songlian.logistics.calculate.GA_TSP;
 
+import com.songlian.logistics.calculate.TspData;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
@@ -35,7 +37,7 @@ public class GA_TSP implements Serializable {
     // 变异对换次数
     private double variationExchangeCount = 1;
     // 遗传最大的迭代次数
-    private int MAX_GEN = 200000;
+    private int MAX_GEN = 2000;
     // 复制最优解的次数(选择种群的最优个体，然后复制几次，将最优个体复制多个，存到新的集合中)
     int cloneNumOfBestIndividual = 3;
     // 最佳迭代数
@@ -45,16 +47,17 @@ public class GA_TSP implements Serializable {
     // 各个个体的累积概率
     double[] probabilitys;
 
-    public GA_TSP(List<double[]> locationList) {
+    public GA_TSP(List<double[]> locationList, double dist[][]) {
         this.locationList = locationList;
+        this.dist = dist;
     }
 
-    public void solve() throws IOException, ClassNotFoundException {
+    public TspData solve() throws IOException, ClassNotFoundException {
         initVar();
-        solver();
+        return solver();
     }
 
-    public void solver() throws IOException, ClassNotFoundException {
+    public TspData solver() throws IOException, ClassNotFoundException {
         while (t < MAX_GEN) {
             popSize = population.size();
             // 基因进化
@@ -63,13 +66,18 @@ public class GA_TSP implements Serializable {
             population = copyGenomeList(newPopulation);
             t++;
         }
+
         // 输出结果
-        System.out.println("最佳迭代次数:" + bestT);
-        System.out.println("最短路程为：" + bestGenome.getPathLen());
+        //System.out.println("最佳迭代次数:" + bestT);
+        //System.out.println("最短路程为：" + bestGenome.getPathLen());
         int[] bestPath = new int[cityNum + 1];
         System.arraycopy(bestGenome.getGenomeArray(), 0, bestPath, 0, bestGenome.getGenomeArray().length);
         bestPath[cityNum] = bestPath[0];
-        System.out.println("最佳路径为：" + Arrays.toString(bestPath));
+        //System.out.println("最佳路径为：" + Arrays.toString(bestPath));
+
+        // 包装返回结果
+        TspData tspData = new TspData(bestGenome.getPathLen(), Arrays.toString(bestPath));
+        return tspData;
     }
 
     // 进化函数
@@ -217,15 +225,16 @@ public class GA_TSP implements Serializable {
         this.population = new ArrayList<>();
         random = new Random(System.currentTimeMillis());
         //初始化距离矩阵
-        dist = new double[cityNum][cityNum];
-        for (int i = 0; i < cityNum; i++) {
-            for (int j = i; j < cityNum; j++) {
-                if (i != j) {
-                    dist[i][j] = getDistance(locationList.get(i), locationList.get(j));
-                    dist[j][i] = dist[i][j];
-                }
-            }
-        }
+        //dist = new double[cityNum][cityNum];
+        //for (int i = 0; i < cityNum; i++) {
+        //    for (int j = i; j < cityNum; j++) {
+        //        if (i != j) {
+        //            dist[i][j] = getDistance(locationList.get(i), locationList.get(j));
+        //            dist[j][i] = dist[i][j];
+        //        }
+        //    }
+        //}
+
         Genome.dist = dist;
         //初始化种群信息
         List<Integer> path = new ArrayList<>();
@@ -248,7 +257,7 @@ public class GA_TSP implements Serializable {
                 bestGenome = copyGenome(genome);
             }
         }
-        System.out.println("初始解为：" + bestGenome.getPathLen());
+        //System.out.println("初始解为：" + bestGenome.getPathLen());
     }
 
     // 挑选种群中适应度最大的个体基因直接加入下一代种群

@@ -124,5 +124,17 @@ public class MaterialController {
             return Result.error(500,"服务器异常,获取库存材料信息失败");
         }
     }
+
+    @PostMapping("getSelectMaterialCount")
+    public Result getSelectMaterialCount(@RequestBody Map map){
+        try {
+            Integer locId = (Integer) map.get("locId");
+            List<Map> data = materialDao.getSelectMaterialCount(locId);
+            return Result.success(data,data.size());
+        }catch (Exception e){
+            System.out.println(e);
+            return Result.error(500,"服务器异常,获取库存材料信息失败");
+        }
+    }
 }
 

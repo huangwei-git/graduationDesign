@@ -46,4 +46,14 @@ public interface MaterialDao extends BaseMapper<Material> {
             "                            ON inv.material_id=mat.material_id\n" +
             "        GROUP BY(inv.material_id)")
     public List<Map> getAllMaterialCount();
+
+    @Select("SELECT\n" +
+            "            inv.material_id as mid,\n" +
+            "            mat.`name` as name,\n" +
+            "            inv.amount as count\n" +
+            "        FROM `inventory` inv\n" +
+            "                 LEFT JOIN  `material` mat\n" +
+            "                            ON inv.material_id=mat.material_id\n" +
+            "        WHERE inv.loc_send_id = #{locId}")
+    public List<Map> getSelectMaterialCount(@Param("locId") Integer locId);
 }
