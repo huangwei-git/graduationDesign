@@ -176,7 +176,8 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
         inventory.setAmount(inventory.getAmount() - orderForm.getAmount());
         inventoryService.updateById(inventory);
 
-        return Result.success();
+        Map resData = new HashMap(){{put("id",String.valueOf(orderForm.getOrderId()));}};
+        return Result.success(resData);
     }
 
 
