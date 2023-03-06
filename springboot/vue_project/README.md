@@ -1,4 +1,4 @@
-# vue_project
+# ILogistics
 
 ## Project setup
 ```

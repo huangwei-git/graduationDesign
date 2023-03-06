@@ -256,8 +256,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
         int len = 12;
 
-        //data.setConstrainNumber(len);
-        //data.setVariableNumber(len);
         double constraintArray[] = new double[len + 2];
         double objectiverArray[] = new double[len];
         for(int i = 0;i < len;i++){

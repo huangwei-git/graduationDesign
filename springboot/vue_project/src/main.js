@@ -7,6 +7,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/globale.css'
 import VueParticles from "vue-particles";
+import VueWechatTitle from "vue-wechat-title"
 
 import axios from "axios";
 //import request from "../utils/request.js";
@@ -14,13 +15,12 @@ import axios from "axios";
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
-
+Vue.use(VueWechatTitle)
 Vue.use(VueRouter)
 
 Vue.use(Vuex)
 import store from '../store/store.js'
 
-//Vue.prototype.$axios = request;
 new Vue({
   render: h => h(App),
   store,

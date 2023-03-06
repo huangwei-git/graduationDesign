@@ -29,6 +29,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, Account> impleme
         try {
             LambdaQueryWrapper<Account> lqw = new LambdaQueryWrapper();
             lqw.eq(username != null && StringUtils.isNotBlank(username), Account::getUsername, username);
+            //lqw.eq(password != null && StringUtils.isNotBlank(password), Account::getPassword, password);
             Account account = this.getOne(lqw);
             if (account!= null) {
                 if (account.getPassword().equals(password))
@@ -38,8 +39,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountDao, Account> impleme
             } else {
                 throw new RequestExpcetion(Constants.CODE_401,"账号不存在！");
             }
-        } catch (Exception e) {
-            throw new ServiceException(Constants.CODE_600,"注册服务异常");
+        } catch (RequestExpcetion re) {
+            throw new RequestExpcetion(Constants.CODE_401,re.getMessage());
+        } catch (Exception e){
+            throw new ServiceException(Constants.CODE_600,"服务器忙，稍后重试");
         }
     }
 }

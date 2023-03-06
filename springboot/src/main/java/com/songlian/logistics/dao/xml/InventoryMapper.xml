@@ -20,7 +20,7 @@
                 ON
                     inv.material_id = mat.material_id
         WHERE
-            1 = 1
+            inv.deleted=0
             <if test="inventoryName != null">
                 AND loc.name like #{inventoryName}
             </if>

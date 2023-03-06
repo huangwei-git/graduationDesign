@@ -9,7 +9,7 @@
 
     <div class="sl-no" style="height: 60px;line-height: 60px;text-align: center;color: #fff;font-size: 22px;">
       <img src="../../src/assets/helloworld.png" alt="logo" style="width: 45px;position: relative;top: 8px">
-      <b v-show="logoTextShow">&nbsp;&nbsp;智慧物流平台</b>
+      <b v-show="logoTextShow">&nbsp;&nbsp;智能物流</b>
     </div>
 
     <el-submenu index="1">
@@ -54,7 +54,6 @@
         <span slot="title">资源配置</span>
       </template>
         <el-menu-item index="/empArrange"><span>员工安排</span></el-menu-item>
-        <el-menu-item index="/addPointsData"><span>路线安排</span></el-menu-item>
     </el-submenu>
 
   </el-menu>
