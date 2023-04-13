@@ -22,13 +22,13 @@ public class TS_TSP {
     // 禁忌表
     public int[][] tabooList;
     // 初始路径编码
-    public int[] Ghh;
+    public int[] Path;
     // 最好的路径编码
-    public int[] bestGh;
+    public int[] bestPath;
     // 当前最好路径编码
-    public int[] LocalGh;
+    public int[] LocalPath;
     // 存放临时编码
-    public int[] tempGh;
+    public int[] tmpPath;
     // 距离矩阵
     public double[][] dist;
     // 最佳的迭代次数*
@@ -72,15 +72,15 @@ public class TS_TSP {
             LocalEvaluation = Double.MAX_VALUE;
             while (n <= N) {
                 // 得到当前编码Ghh的邻居编码tempGh
-                tempGh = generateNewGh(Ghh.clone(), tempGh.clone());
+                tmpPath = generateNewPath(Path.clone(), tmpPath.clone());
                 // 判断其是否在禁忌表中
-                if (!judge(tempGh)) {
+                if (!judge(tmpPath)) {
                     // 如果不在
-                    tempEvaluation = evaluate(tempGh);
+                    tempEvaluation = evaluate(tmpPath);
                     if (tempEvaluation < LocalEvaluation) {
                         // 如果临时解优于本次领域搜索的最优解
                         // 那么就将临时解替换本次领域搜索的最优解
-                        LocalGh = tempGh.clone();
+                        LocalPath = tmpPath.clone();
                         LocalEvaluation = tempEvaluation;
                     }
                     n++;
@@ -90,19 +90,19 @@ public class TS_TSP {
                 // 如果本次搜索的最优解优于全局最优解
                 // 那么领域最优解替换全局最优解
                 bestT = t;
-                bestGh = LocalGh.clone();
-                bestEvaluation = evaluate(bestGh);
+                bestPath = LocalPath.clone();
+                bestEvaluation = evaluate(bestPath);
             }
-            Ghh = LocalGh.clone();
+            Path = LocalPath.clone();
             // 加入禁忌表
-            enterTabooList(LocalGh.clone());
+            enterTabooList(LocalPath.clone());
             t++;
         }
         // 输出结果
         //System.out.println("最佳迭代次数:"+bestT);
         //System.out.println("最短路程为："+bestEvaluation);
         int[] bestPath = new int[cityNum+1];
-        System.arraycopy(bestGh, 0, bestPath, 0, bestGh.length);
+        System.arraycopy(this.bestPath, 0, bestPath, 0, this.bestPath.length);
         bestPath[cityNum] = bestPath[0];
         //System.out.println("最佳路径为："+ Arrays.toString(bestPath));
 
@@ -143,7 +143,7 @@ public class TS_TSP {
     }
 
     // 领域交换，生成新解(随机指定数组中的两个数，不包括首尾，然后让这两个数进行位置互换，达到生成一个新路线的作用)
-    public int[] generateNewGh(int[] Gh, int[] tempGh) {
+    public int[] generateNewPath(int[] Gh, int[] tempGh) {
         int temp;
         //将Gh复制到tempGh
         tempGh = Gh.clone();
@@ -169,19 +169,19 @@ public class TS_TSP {
     // 随机生成一个初始解
     public int[] getInitGh() throws Exception {
         HashSet<Integer> indexList = new HashSet<>();
-        for (int i = 0; i < Ghh.length; i++) {
+        for (int i = 0; i < Path.length; i++) {
             while (true) {
                 int r = random.nextInt(cityNum);
                 if (!indexList.contains(r)) {
                     // 只有当地点不重合时才添加进列表，保证初始解中没有重复的地点
                     indexList.add(r);
-                    Ghh[i] = r;
+                    Path[i] = r;
                     break;
                 }
             }
         }
         //System.out.println("初始解：" + Arrays.toString(Ghh));
-        return Ghh.clone();
+        return Path.clone();
     }
 
     // 计算两点之间的距离（使用伪欧氏距离，可以减少计算量）
@@ -196,10 +196,10 @@ public class TS_TSP {
     public void initVar() throws Exception {
         cityNum = pointList.size();//城市数量为点的数量
         tabooList = new int[len][cityNum];//禁忌表
-        Ghh = new int[cityNum];//初始路径编码
-        bestGh = new int[cityNum];//最好的路径编码
-        LocalGh = new int[cityNum];//当前最好路径编码
-        tempGh = new int[cityNum];//存放临时编码
+        Path = new int[cityNum];//初始路径编码
+        bestPath = new int[cityNum];//最好的路径编码
+        LocalPath = new int[cityNum];//当前最好路径编码
+        tmpPath = new int[cityNum];//存放临时编码
         //dist = new double[cityNum][cityNum];//距离矩阵
         // 初始化距离矩阵
         for (int i = 0; i < dist.length; i++) {
@@ -221,12 +221,12 @@ public class TS_TSP {
         bestT = 0;
         t = 0;
         random = new Random();
-        Ghh = getInitGh();
+        Path = getInitGh();
         // 复制当前路径编码给最优路径编码
-        tempGh = Ghh.clone();
-        bestGh = tempGh.clone();
-        bestEvaluation = evaluate(bestGh);
-        tempEvaluation = evaluate(tempGh);
+        tmpPath = Path.clone();
+        bestPath = tmpPath.clone();
+        bestEvaluation = evaluate(bestPath);
+        tempEvaluation = evaluate(tmpPath);
         LocalEvaluation = Double.MAX_VALUE;
     }
 

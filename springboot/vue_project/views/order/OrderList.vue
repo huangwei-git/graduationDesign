@@ -17,8 +17,7 @@
 
     <div >
         <AddOrder style="display: inline-block"/>
-        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download" style="margin-left: 5px">导出数据</el-button>
+        <el-button type="warning" icon="el-icon-download" @click="exportData" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -160,6 +159,10 @@ export default {
     handleCurrentChange(val) {
       this.pageData.pageNum = val;
       this.loadPost();
+    },
+    // 导出数据
+    exportData(){
+      window.open(this.$httpUrl+"/order/export");
     },
     // 保存被点击的行信息
     recordRowInfo(row){

@@ -32,6 +32,8 @@ public class TransportionSolution {
     private boolean openProcessPrint = false;
     // 方案总费用
     private int total = 0;
+    // 迭代次数
+    private int cnt=1;
 
     // 记录每次的方案
     private List<int[][]> recordPlan = new LinkedList<>();
@@ -57,18 +59,19 @@ public class TransportionSolution {
         this.useVogel = useVogel;
     }
 
-    public void Run(){
+    public void solve(){
         // 0. 产销平衡处理
-        SupplyAndDemandBalance();
+        supplyAndDemandBalance();
         // 1. 获得初始方案
-        if(useVogel) getInitialPlanByVogel();
-        else getInitialPlanByMinElement();
+        if(useVogel) initialPlanByVogel();
+        else initialPlanByMinElement();
         // 2. 位势法 + 闭合回路调整
         Point point = null;
         while((point = getBaseVariable()) != null){
+            cnt++;
             // 2.1 获得入基变量
             // 2.2 通过入基变量求闭合回路
-            LinkedList<Point> path = getclosedLoop(point.x, point.y);
+            LinkedList<Point> path = getClosedLoop(point.x, point.y);
             adjustClosedLoop(path,point);
             if(this.openProcessPrint) System.out.println("-----------------------");
         }
@@ -78,12 +81,13 @@ public class TransportionSolution {
         if(this.openProcessPrint){
             System.out.println("==========最终方案为==========");
             printArray(planTab);
+            System.out.println("迭代次数："+cnt);
             System.out.println("需要的价格为：" + this.total);
         }
     }
 
     // 0. 产销平衡化
-    private void SupplyAndDemandBalance(){
+    private void supplyAndDemandBalance(){
         int supply = 0,demand = 0;
         for(int i = 0;i < numOfSupplier;i++) supply += supplier[i];
         for(int i = 0;i < numOfDemander;i++) demand += demander[i];
@@ -113,7 +117,7 @@ public class TransportionSolution {
         colGeopotential = new int[numOfDemander];
     }
 
-    // 1. 贪心法：计算所有行和列中，最小值和次小值的差值，从中取出最大的一个，作为入基变量
+    // 1. 伏格尔法-贪心：计算所有行和列中，最小值和次小值的差值，从中取出最大的一个，作为入基变量
     private Point getGap(int invalidRows[], int invalidColumns[]){
         int max = Integer.MIN_VALUE;
         Point p = new Point(-1,-1);
@@ -179,7 +183,7 @@ public class TransportionSolution {
 
     // 2. 获得初始解决方案
     //      2.1 方法一： Vogel伏格尔法
-    private void getInitialPlanByVogel(){
+    private void initialPlanByVogel(){
         int temp_A[] = supplier.clone();
         int temp_B[] = demander.clone();
         int invalidRows[] = new int[numOfSupplier];
@@ -204,6 +208,7 @@ public class TransportionSolution {
             if((temp_B[point.y] -= min) == 0) {invalidColumns[point.y] = 1;cnt_col--;cnt++;};
             // 退化
             if(cnt == 2){
+                System.out.println("出现退化！");
                 Point tmpPoint = new Point(-1, -1);
                 int tmp = Integer.MAX_VALUE;
                 for(int i = 0;i < numOfDemander;i++){
@@ -239,7 +244,7 @@ public class TransportionSolution {
     }
 
     //      2.2 方法二： 最小元素法
-    private void getInitialPlanByMinElement(){
+    private void initialPlanByMinElement(){
         int temp_A[] = supplier.clone();
         int temp_B[] = demander.clone();
         int invalidRows[] = new int[numOfSupplier];
@@ -271,14 +276,18 @@ public class TransportionSolution {
             };
 
             int cnt = 0;
-            int min = temp_A[point.x] < temp_B[point.y]?temp_A[point.x]:temp_B[point.y];
+            // 找到单元格对应的行、列中叫小者
+            int min = temp_A[point.x] < temp_B[point.y] ? temp_A[point.x] : temp_B[point.y];
+            // 确定供需关系
             planTab[point.x][point.y] = min;
+            // 标记为基变量
             target[point.x][point.y] = 1;
             if((temp_A[point.x] -= min) == 0) {invalidRows[point.x] = 1;cnt_row--;cnt++;};
             if((temp_B[point.y] -= min) == 0) {invalidColumns[point.y] = 1;cnt_col--;cnt++;};
 
             // 退化
             if(cnt == 2){
+                // 找补"0"的单元格
                 Point tmpPoint = new Point(-1, -1);
                 int tmp = Integer.MAX_VALUE;
                 for(int i = 0;i < numOfDemander;i++){
@@ -423,7 +432,7 @@ public class TransportionSolution {
     //}
 
     // 5. 递归求闭合回路1
-    private LinkedList getclosedLoop(int S, int T) {
+    private LinkedList getClosedLoop(int S, int T) {
         LinkedList path = null;
         int visisted[][] = new int[target.length][target[0].length];
         // 在当前点的左右方向出发找闭合回路

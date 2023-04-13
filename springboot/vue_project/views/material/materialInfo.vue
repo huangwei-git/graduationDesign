@@ -20,8 +20,6 @@
 
     <div >
         <el-button type="success" @click="addTable" icon="el-icon-plus">新增记录</el-button>
-        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -53,7 +51,7 @@
           :default-sort = "{prop: 'mid', order: 'inscending'}"
           :cell-style="{ textAlign: 'center' }"
           :header-cell-style="{ textAlign: 'center',background:'#f5f7fa',color:'#950842' }"
-          style="margin-top: 10px;width: 761.5px;"
+          style="margin-top: 10px;width: 641px;"
           @row-click="recordRowInfo"
       >
 
@@ -70,7 +68,6 @@
         <el-table-column prop="name"  label="物品名称" width="100px"></el-table-column>
         <el-table-column prop="cost"  label="物品成本" width="100px"></el-table-column>
         <el-table-column prop="price"  label="物品单价" width="100px"></el-table-column>
-        <el-table-column prop="volume"  label="运输量/车" width="120px"></el-table-column>
 
         <el-table-column prop="operate" width="180px" align="right">
           <template slot="header" slot-scope="scope">操作</template>
@@ -116,10 +113,6 @@
 
         <el-form-item label="物品单价" prop="price">
           <el-input-number v-model="form.price" :step="1" :min="minPrice" step-strictly></el-input-number>
-        </el-form-item>
-
-        <el-form-item label="运输量/车" prop="volume">
-          <el-input-number v-model="form.volume" :step="1" :min="1" step-strictly></el-input-number>
         </el-form-item>
 
         <el-form-item>
@@ -288,6 +281,7 @@ export default {
     },
     // 删除用户
     deleteMaterial(){
+      console.log("物品名称",this.clickedRow);
       this.$confirm(`是否要将${this.clickedRow.name}的信息从表中移除？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -299,7 +293,7 @@ export default {
               if(res.code == 200){
                 this.$notify.success({
                   title:"成功！",
-                  message:`员工"${this.clickedRow.name}"已被删除`,
+                  message:`物品"${this.clickedRow.name}"已被删除`,
                 })
               }else {
                 this.$notify.error({

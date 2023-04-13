@@ -1,5 +1,7 @@
 package com.songlian.logistics.service.impl;
 
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +53,8 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
     @Autowired
     private OrderFormService orderFormService;
 
+    private List currentPageData = null;
+
     @Override
     public Result pageList(QueryPageParam query) {
         try {
@@ -66,11 +75,48 @@ public class OrderDetailServiceImpl extends ServiceImpl<OrderDetailDao, OrderDet
 
             long listTotal = this.list().size();
             long pageTotal = orderDetailDao.orderDetailList(orderId, materialName,supplierName,demanderName,sortField,sortDirection,0l,listTotal).size();
+
+            currentPageData = data;
+
             return Result.success(data,pageTotal);
         } catch (Exception e) {
             System.out.println("MaterialService.listByPage:" + e);
             return Result.fail("查询订单详情失败，请稍后重试");
         }
+    }
+
+    @Override
+    public void exportData(HttpServletResponse response) throws IOException {
+        // 1. 从数据库中查出所有数据
+        List list = currentPageData;
+
+        // 2. 创建工具类，写出到浏览器
+        // hutool.cn/docs/#/poi/Excel生成-ExcelWriter
+        ExcelWriter excelWriter = ExcelUtil.getWriter(true);
+        // 3. 定义表头映射字段
+        excelWriter.addHeaderAlias("orderId","订单编号");
+        excelWriter.addHeaderAlias("materialName","物品名称");
+        excelWriter.addHeaderAlias("amount","数量");
+        excelWriter.addHeaderAlias("seq","运输顺序");
+        excelWriter.addHeaderAlias("supplierName","发货地");
+        excelWriter.addHeaderAlias("demanderName","收货地");
+        excelWriter.addHeaderAlias("cost","物品成本");
+        excelWriter.addHeaderAlias("price","物品价格");
+        excelWriter.addHeaderAlias("toll","运费");
+        excelWriter.addHeaderAlias("profit","利润");
+        excelWriter.addHeaderAlias("total","总价");
+        // 4. 写出list内容到Excel文件使用默认样式，强制输出标题
+        excelWriter.write(list,true);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("订单详情","UTF-8");
+        response.setHeader("Content-Disposition","attachment;filename=" + fileName + ".xlsx");
+
+
+        ServletOutputStream out = response.getOutputStream();
+        excelWriter.flush(out, true);
+        out.close();
+        excelWriter.close();
     }
 
 

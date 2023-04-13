@@ -21,12 +21,6 @@
       </div>
     </div>
 
-    <div >
-        <el-button type="success" @click="addTable" icon="el-icon-plus">新增记录</el-button>
-        <el-button type="warning" icon="el-icon-upload2"  style="margin-left: 5px">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download"  style="margin-left: 5px">导出数据</el-button>
-    </div>
-
     <!--暂时隐藏-->
     <div class="empty" style="display: flex;text-align:center;justify-content: center;width: 100%">
       <el-empty description="暂无数据" v-show="(tableData.length==0 && !loading)"></el-empty>

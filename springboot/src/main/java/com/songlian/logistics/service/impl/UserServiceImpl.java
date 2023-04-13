@@ -199,7 +199,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                     user.setLocSendId(locMapId.get(locName));
                 }
             }catch (RequestExpcetion e){
-                System.out.println("错辣！");
+                System.out.println("出错了！");
                 throw e;
             }
             System.out.println("user = " + user);

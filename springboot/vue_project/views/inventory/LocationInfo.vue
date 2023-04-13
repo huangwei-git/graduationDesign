@@ -38,8 +38,6 @@
 
         <LocationEcharts style="display: inline-block;margin-left: 0px"/>
         <el-button type="success" @click="addTable" icon="el-icon-plus" style="margin-left: 5px">新增地址</el-button>
-        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">

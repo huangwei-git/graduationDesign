@@ -5,6 +5,9 @@ import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.OrderForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,4 +27,6 @@ public interface OrderFormService extends IService<OrderForm> {
     public Result genOrderOfTsp(HashMap map);
 
     public List<HashMap> getOrderBuffer(String key);
+
+    void exportData(HttpServletResponse response) throws IOException;
 }

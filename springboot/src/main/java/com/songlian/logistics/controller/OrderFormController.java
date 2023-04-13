@@ -1,9 +1,6 @@
 package com.songlian.logistics.controller;
 
 
-import cn.hutool.db.sql.Order;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.songlian.logistics.common.Constants;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.exception.RequestExpcetion;
@@ -13,6 +10,7 @@ import com.songlian.logistics.service.OrderFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,12 +38,12 @@ public class OrderFormController {
     }
 
     @PostMapping("/compute")
-    public Result compute(@RequestBody HashMap map){
+    public Result genAutoDistributionOrder(@RequestBody HashMap map){
         return orderFormService.genOrder(map);
     }
 
     @PostMapping("/tsp")
-    public Result TSP(@RequestBody HashMap map){
+    public Result genAppointDistributionOrder(@RequestBody HashMap map){
         return orderFormService.genOrderOfTsp(map);
     }
 
@@ -99,6 +97,12 @@ public class OrderFormController {
             System.out.println("添加订单失败！ ： " + e);
             return Result.fail("服务器异常，请稍后重试");
         }
+    }
+
+    // 导出
+    @GetMapping("/export")
+    public void exportData(HttpServletResponse response) throws Exception {
+        orderFormService.exportData(response);
     }
 }
 

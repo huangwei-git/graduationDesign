@@ -25,7 +25,7 @@ public class Generator {
         //globalConfig.setOutputDir(System.getProperty("user.dir") + "../demo04_generator/src/main/java");
         globalConfig.setOutputDir(path);
         globalConfig.setOpen(true);                    // 设置生成完毕后是否打开生成代码所在目录
-        globalConfig.setAuthor("宋黄玮");                  // 设置作者
+        globalConfig.setAuthor("黄玮");                  // 设置作者
         globalConfig.setFileOverride(true);             // 设置是否覆盖原始生成的文件
         globalConfig.setMapperName("%sDao");            // 设置数据层结构名，%s为占位符，代指模块名称
         globalConfig.setIdType(IdType.ASSIGN_ID);       // 设置ID生成策略

@@ -1,5 +1,7 @@
 package com.songlian.logistics.service.impl;
 
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.songlian.logistics.calculate.ACO_TSP.ACO_TSP;
@@ -25,7 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -47,6 +53,8 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
 
     @Autowired
     private OrderFormDao orderFormDao;
+
+    private List currentPageData = null;
 
     // 缓存生成的订单
     private HashMap<String,List<HashMap>> orderBuffer = new HashMap<>();
@@ -72,6 +80,8 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
                             materialName,
                             sortField,
                             sortDirection,0l,listTotal).size();
+
+            currentPageData = data;
 
             return Result.success(data,pageTotal);
         } catch (Exception e) {
@@ -121,7 +131,7 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         // 控制台输出优化调整过程
         transportionSolution.setOpenProcessPrint(true);
         //System.out.println(transportionSolution.getRecordPlan().size());
-        transportionSolution.Run();
+        transportionSolution.solve();
 
         /* 获取最终方案前的方案 */
         List<List<HashMap>> adjustProcessList = new LinkedList<>();
@@ -402,6 +412,37 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         return res;
     }
 
+    @Override
+    public void exportData(HttpServletResponse response) throws IOException {
+        // 1. 从数据库中查出所有数据
+        List list = currentPageData;
+
+        // 2. 创建工具类，写出到浏览器
+        // hutool.cn/docs/#/poi/Excel生成-ExcelWriter
+        ExcelWriter excelWriter = ExcelUtil.getWriter(true);
+        // 3. 定义表头映射字段
+        excelWriter.addHeaderAlias("orderId","订单编号");
+        excelWriter.addHeaderAlias("materialName","物品名称");
+        excelWriter.addHeaderAlias("amount","数量");
+        excelWriter.addHeaderAlias("createTime","创建时间");
+        excelWriter.addHeaderAlias("cost","物品价格");
+        excelWriter.addHeaderAlias("profit","利润");
+        excelWriter.addHeaderAlias("toll","运费");
+        excelWriter.addHeaderAlias("total","总价");
+        // 4. 写出list内容到Excel文件使用默认样式，强制输出标题
+        excelWriter.write(list,true);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("订单信息","UTF-8");
+        response.setHeader("Content-Disposition","attachment;filename=" + fileName + ".xlsx");
+
+
+        ServletOutputStream out = response.getOutputStream();
+        excelWriter.flush(out, true);
+        out.close();
+        excelWriter.close();
+    }
+
     public List<List<HashMap>> getAdjustProcess(List<int[][]> plans,
                                                 int rowLen,
                                                 int colLen,
@@ -451,6 +492,8 @@ public class OrderFormServiceImpl extends ServiceImpl<OrderFormDao, OrderForm> i
         return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)) / 10.0);
 //        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
     }
+
+
 
     private Integer s2i(String field, Integer errValue) {
         Integer res = null;

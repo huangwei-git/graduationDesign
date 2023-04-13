@@ -57,7 +57,7 @@ public class TspSolution {
     }
 
 
-    public void TSP(){
+    public void solver(){
         //  初始化dp表：当V为空集时，dp[i][0]等于点i到起始点0的距离
         for(int i = 0;i < this.rowLen;i++){
             dp[i][0] = graph[i][0];
@@ -128,7 +128,7 @@ public class TspSolution {
     }
 
     public int[] printPath(){
-        this.TSP();
+        this.solver();
         this.getPath();
         int res[] = new int[path.size()];
         res[0] = this.dp[0][this.colLen - 1];

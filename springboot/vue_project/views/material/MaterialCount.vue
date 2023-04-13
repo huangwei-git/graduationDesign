@@ -20,8 +20,7 @@
 
     <div >
         <!--<MaterialEcharts style="display: inline-block;"/>-->
-        <el-button type="warning" icon="el-icon-upload2" style="margin-left: 5px">导入数据</el-button>
-        <el-button type="warning" icon="el-icon-download"  style="margin-left: 5px">导出数据</el-button>
+        <el-button type="warning" icon="el-icon-download" @click="exportData" style="margin-left: 5px">导出数据</el-button>
 
       <div class="sl-no" style="display: inline-block;float: right">
         <el-select v-model="sortField" placeholder="排序" style="margin-left: 5px;width: 150px">
@@ -36,13 +35,13 @@
       </div>
     </div>
 
-    <!--暂时隐藏-->
-    <div class="empty" style="display: flex;text-align:center;justify-content: center;width: 100%">
-      <el-empty description="暂无数据" v-show="(tableData.length==0 && !loading)"></el-empty>
-    </div>
     <div class="tab_div" align="center" style="margin-top: 20px">
       <el-row>
         <el-col :span="9" :push="4">
+          <!--暂时隐藏-->
+          <div class="empty" style="display: flex;text-align:center;justify-content: center;width: 100%">
+            <el-empty description="暂无数据" v-show="(tableData.length==0 && !loading)"></el-empty>
+          </div>
           <el-table
               v-show="(tableData.length > 0 || loading)"
               ref="mutiTable"
@@ -92,10 +91,6 @@
       </el-row>
     </div>
 
-
-
-
-
   </div>
 </template>
 
@@ -121,9 +116,9 @@ export default {
           .then(res => res.data)
           .then(res => {
             this.loading = true;
-            console.log(res.data)
             this.pageData.totalPage = res.total;
             this.dataFormat(res);
+            this.$bus.$emit("searchData",res.data);
           })
     },
     search(){
@@ -289,6 +284,10 @@ export default {
       console.log(this.form);
       if(this.form.materialId == '') this.saveForm();
       else this.updateForm();
+    },
+    //====导出数据======
+    exportData(){
+      window.open(this.$httpUrl+"/material/export");
     },
     //====搜索栏字数限制====
     lengthLimit(){

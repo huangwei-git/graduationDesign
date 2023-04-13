@@ -14,12 +14,24 @@ export default {
   name: "MaterialEcharts",
   data(){
     return{
-      piechartsData:'',
+      piechartsData:[],
       dialogVisible: false,
     }
   },
   methods:{
+    setPiechartsData(data){
+      this.piechartsData = [];
+      for(let i = 0;i <= data.length;i++){
+        if(i != data.length){
+          this.piechartsData.push({name:data[i].name,value:data[i].count});
+        }else{
+          this.initEcharts();
+        }
+      }
+    },
     initEcharts(){
+      var chartDom = document.getElementById('main');
+      var myChart = echarts.init(chartDom);
       var option;
 
       option = {
@@ -61,31 +73,11 @@ export default {
         ]
       };
 
-      var chartDom = document.getElementById('main');
-      var myChart = echarts.init(chartDom);
-      this.$axios.get(this.$httpUrl + "/material/piecharts")
-          .then(res => res.data)
-          .then(res => {
-            if (res.code == 200) {
-              option.series[0].data = res.data;
-            } else {
-              this.$message.error(res.msg);
-            }
-          }).then(()=>{
-        myChart.setOption(option);
-      })
+      myChart.setOption(option);
     },
-    open(){
-      this.$nextTick(() => {
-        //  执行echarts方法
-        this.initEcharts()
-      })
-    }
   },
-  beforeMount() {
-  }
-  ,mounted() {
-    this.initEcharts()
+  mounted() {
+    this.$bus.$on("searchData",this.setPiechartsData);
   }
 }
 </script>

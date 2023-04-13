@@ -1,18 +1,75 @@
 package com.songlian.logistics.calculate;
 
+import com.songlian.logistics.calculate.ACO_TSP.ACO_TSP;
+import com.songlian.logistics.calculate.GA_TSP.GA_TSP;
+import com.songlian.logistics.calculate.IP_TSP.IP_TSP;
+import com.songlian.logistics.calculate.TabuSearch_TSP.TS_TSP;
+import com.songlian.logistics.pojo.OrderForm;
+import com.songlian.logistics.service.impl.OrderFormServiceImpl;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Main {
-    public static void main(String[] args) {
-        Main Mainclas = new Main();
-        double[][] arr = Mainclas.getDoubleArray2(8,12);
-        for (int k = 0; k < 6; k++) {
-            for(int i = 0;i < 12;i++){
-                for (int j = 0; j < 12; j++) {
-                    System.out.print(arr[i+k*12][j] + "     ");
-                }
-                System.out.println();
+    public static void main(String[] args) throws IOException {
+        File file = new File("./src/main/resources/att48.tsp");
+        BufferedReader br = null;
+        FileReader fr = null;
+
+        int N = 48;
+
+        double point[][] = new double[N][2];
+        try {
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+
+            String data = br.readLine();
+            while (data != null){
+                String strs[] = data.split(" ");
+                int index = Integer.valueOf(strs[0]) - 1;
+                point[index][0] = Double.valueOf(strs[1]);
+                point[index][1] = Double.valueOf(strs[2]);
+                data = br.readLine();
             }
-            System.out.println("\n===============================");
+
+            List<double[]> list = new ArrayList<>();
+            Collections.addAll(list,point);
+            double[][] dist = new double[N][N];
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    dist[i][j] = getDistance(point[i],point[j]);
+                }
+            }
+            System.out.println(new TS_TSP(list,dist).solve());
+            System.out.println(new GA_TSP(list,dist).solve());
+            System.out.println(new ACO_TSP(list,dist).solve());
+            System.out.println(new IP_TSP(list,dist).solve());
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }finally {
+            if(fr!=null){
+                fr.close();
+            }
+            if(br!=null){
+                br.close();
+            }
         }
+
+    }
+
+    public static double getDistance(double[] place1, double[] place2) {
+        // 伪欧氏距离在根号内除以了一个10
+        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
+//        return Math.sqrt((Math.pow(place1[0] - place2[0], 2) + Math.pow(place1[1] - place2[1], 2)));
     }
 
     public double[][] getDoubleArray(int init,int cnt) {

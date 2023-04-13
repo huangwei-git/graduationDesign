@@ -1,5 +1,7 @@
 package com.songlian.logistics.service.impl;
 
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,6 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,8 +109,8 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialDao, Material> impl
         if (mid != null && mid == -1) return Result.fail("materialId参数错误");
 
         if(name!=null) name = "%" + name + "%";
-        Integer total = this.list().size();
         List<HashMap> map = materialDao.getMaterialCount(mid,name,(pageNum- 1)*pageSize,pageSize);
+        Integer total = materialDao.getMaterialCount(mid,name,0,Integer.MAX_VALUE).size();
         return Result.success(map,total);
     }
 
@@ -120,6 +126,32 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialDao, Material> impl
         }catch (Exception e){
             return Result.error(Constants.CODE_500,"图形加载时出错");
         }
+    }
+
+    @Override
+    public void exportData(HttpServletResponse response) throws IOException {
+        // 1. 从数据库中查出所有数据
+        List list = materialDao.getAllMaterialCount();
+
+        // 2. 创建工具类，写出到浏览器
+        // hutool.cn/docs/#/poi/Excel生成-ExcelWriter
+        ExcelWriter excelWriter = ExcelUtil.getWriter(true);
+        // 3. 定义表头映射字段
+        excelWriter.addHeaderAlias("mid","材料ID");
+        excelWriter.addHeaderAlias("name","材料名");
+        excelWriter.addHeaderAlias("count","总数");
+        // 4. 写出list内容到Excel文件使用默认样式，强制输出标题
+        excelWriter.write(list,true);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("材料数量统计","UTF-8");
+        response.setHeader("Content-Disposition","attachment;filename=" + fileName + ".xlsx");
+
+
+        ServletOutputStream out = response.getOutputStream();
+        excelWriter.flush(out, true);
+        out.close();
+        excelWriter.close();
     }
 
     private Integer s2i(String field, Integer errValue) {

@@ -1,5 +1,7 @@
 package com.songlian.logistics.service.impl;
 
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
@@ -11,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 

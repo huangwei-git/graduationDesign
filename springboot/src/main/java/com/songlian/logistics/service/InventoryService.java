@@ -5,6 +5,7 @@ import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Inventory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,6 @@ import java.util.Map;
 public interface InventoryService extends IService<Inventory> {
 
     public Result getStoreInfo(QueryPageParam query);
+
 
 }

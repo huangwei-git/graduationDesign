@@ -8,6 +8,7 @@ import com.songlian.logistics.service.OrderDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -29,6 +30,12 @@ public class OrderDetailController {
     public Result pageList(@RequestBody QueryPageParam query){
         Result res = orderDetailService.pageList(query);
         return res;
+    }
+
+    // 导出
+    @GetMapping("/export")
+    public void exportData(HttpServletResponse response) throws Exception {
+        orderDetailService.exportData(response);
     }
 }
 

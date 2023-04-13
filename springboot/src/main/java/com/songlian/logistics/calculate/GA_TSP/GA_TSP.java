@@ -130,7 +130,7 @@ public class GA_TSP implements Serializable {
             genomeArray1[i] = genomeArray2[i];
             genomeArray2[i] = temp;
         }
-        // 找到重复基因
+        // 找到重复基因：每个城市只能经过一次，需要判断交叉后的基因是否有重复经过的城市
         HashSet<Integer> set = new HashSet<>();
         // <index,value>
         HashMap<Integer, Integer> repeatMap = new HashMap<>();
@@ -140,6 +140,7 @@ public class GA_TSP implements Serializable {
             }
         }
         set.clear();
+        // 找到使得解不合法的位置，换回基因
         for (int i = 0; i < genomeArray2.length; i++) {
             if (!set.add(genomeArray2[i])) {
                 for (int key : repeatMap.keySet()) {
@@ -198,6 +199,7 @@ public class GA_TSP implements Serializable {
     // 变异(多次对换)
     private void variation(int k) {
         Genome genome = newPopulation.get(k);
+        // 获得基因序列
         int[] genomeArray = genome.getGenomeArray();
         for (int i = 0; i < variationExchangeCount; i++) {
             int r1 = random.nextInt(cityNum);
@@ -242,14 +244,18 @@ public class GA_TSP implements Serializable {
             path.add(i);
         }
         for (int i = 0; i < popSize; i++) {
+            // shuffle函数：随机打乱集合中的元素顺序
             Collections.shuffle(path);
             int[] initPath = new int[cityNum];
             for (int j = 0; j < path.size(); j++) {
                 initPath[j] = path.get(j);
             }
+            // 创建一个基因
             Genome genome = new Genome(initPath.clone());
+            // 添加到“所有基因信息表”
             population.add(genome);
         }
+        // 遍历基因库，找到一个最好的基因
         bestGenome = copyGenome(population.get(0));
         for (int i = 1; i < popSize; i++) {
             Genome genome = population.get(i);
@@ -292,6 +298,7 @@ public class GA_TSP implements Serializable {
             totalFitness += genome.getFitness();
         }
         double rate = 0.0;
+        // 累计概率 = 第i个个体的适应度/总适应度
         for (int i = 0; i < population.size(); i++) {
             rate += (population.get(i).getFitness() / totalFitness);
             probabilitys[i] = rate;

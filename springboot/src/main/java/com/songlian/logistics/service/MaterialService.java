@@ -7,6 +7,10 @@ import com.songlian.logistics.common.QueryPageParam;
 import com.songlian.logistics.common.Result;
 import com.songlian.logistics.pojo.Material;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 /**
  * <p>
  *  服务类
@@ -21,5 +25,7 @@ public interface MaterialService extends IService<Material> {
     public Result materialCount(QueryPageParam query);
 
     public Result materialCountOfPieCharts(Integer mid,String name);
+
+    public void exportData(HttpServletResponse response) throws IOException;
 
 }

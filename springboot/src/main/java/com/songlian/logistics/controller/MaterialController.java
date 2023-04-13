@@ -10,6 +10,7 @@ import org.apache.ibatis.javassist.bytecode.ExceptionsAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,6 @@ public class MaterialController {
     @PostMapping
     public Result save(@RequestBody Material material) {
         try {
-            System.out.println(material);
             materialService.save(material);
             return Result.success();
         }catch (Exception e){
@@ -135,6 +135,12 @@ public class MaterialController {
             System.out.println(e);
             return Result.error(500,"服务器异常,获取库存材料信息失败");
         }
+    }
+
+    // 导出
+    @GetMapping("/export")
+    public void exportData(HttpServletResponse response) throws Exception {
+        materialService.exportData(response);
     }
 }
 

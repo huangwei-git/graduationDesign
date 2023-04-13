@@ -63,12 +63,12 @@ public class ACO_TSP {
                     }
                     bestT = g;
                 }
-                // 更新这只蚂蚁的信息数变化矩阵，对称矩阵
+                // 更新这只蚂蚁的信息素变化矩阵，对称矩阵
                 for (int j = 0; j < cityNum; j++) {
-                    ants[i].getDelta()[ants[i].getTabu().get(j)][ants[i]
+                    ants[i].getPheromoneDelta()[ants[i].getTabu().get(j)][ants[i]
                             .getTabu().get(j + 1)] = (double) (1.0 / ants[i]
                             .getTourLength());
-                    ants[i].getDelta()[ants[i].getTabu().get(j + 1)][ants[i]
+                    ants[i].getPheromoneDelta()[ants[i].getTabu().get(j + 1)][ants[i]
                             .getTabu().get(j)] = (1.0 / ants[i]
                             .getTourLength());
                 }
@@ -137,7 +137,7 @@ public class ACO_TSP {
         for (int i = 0; i < cityNum; i++) {
             for (int j = 0; j < cityNum; j++) {
                 for (int k = 0; k < antNum; k++) {
-                    pheromone[i][j] += ants[k].getDelta()[i][j];
+                    pheromone[i][j] += ants[k].getPheromoneDelta()[i][j];
                 }
             }
         }

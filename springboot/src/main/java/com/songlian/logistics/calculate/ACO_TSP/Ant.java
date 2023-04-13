@@ -14,9 +14,9 @@ public class Ant implements Cloneable {
     // 允许搜索的城市
     private List<Integer> allowedCities;
     // 信息素变化矩阵
-    private double[][] delta;
+    private double[][] pheromoneDelta;
     // 距离矩阵
-    private double[][] distance;
+    private double[][] dist;
     private double alpha;
     private double beta;
     // 路径长度
@@ -43,14 +43,14 @@ public class Ant implements Cloneable {
         // 初始禁忌表
         tabu = new HashMap<>();
         // 初始距离矩阵
-        this.distance = distance;
-        // 初始信息数变化矩阵为0
-        delta = new double[cityNum][cityNum];
+        this.dist = distance;
+        // 初始信息素变化矩阵为0
+        pheromoneDelta = new double[cityNum][cityNum];
         for (int i = 0; i < cityNum; i++) {
             Integer integer = i;
             allowedCities.add(integer);
             for (int j = 0; j < cityNum; j++) {
-                delta[i][j] = 0.f;
+                pheromoneDelta[i][j] = 0.f;
             }
         }
         // 设置起始城市
@@ -76,15 +76,15 @@ public class Ant implements Cloneable {
         // 计算分母部分
         for (Integer i : allowedCities) {
             sum += Math.pow(pheromone[currentCity][i], alpha)
-                    * Math.pow(1.0 / distance[currentCity][i], beta);
+                    * Math.pow(1.0 / dist[currentCity][i], beta);
         }
         // 计算概率矩阵
         for (int i = 0; i < cityNum; i++) {
             boolean flag = false;
             for (Integer j : allowedCities) {
                 if (i == j) {
-                    p[i] = (double) (Math.pow(pheromone[currentCity][i], alpha) * Math
-                            .pow(1.0 / distance[currentCity][i], beta)) / sum;
+                    p[i] = (double) (Math.pow(pheromone[currentCity][i], alpha) *
+                            Math.pow(1.0 / dist[currentCity][i], beta)) / sum;
                     flag = true;
                     break;
                 }
@@ -123,7 +123,7 @@ public class Ant implements Cloneable {
         double len = 0.0;
         //禁忌表tabu最终形式：起始城市,城市1,城市2...城市n,起始城市
         for (int i = 0; i < cityNum; i++) {
-            len += distance[this.tabu.get(i)][this.tabu.get(i + 1)];
+            len += dist[this.tabu.get(i)][this.tabu.get(i + 1)];
         }
         return len;
     }

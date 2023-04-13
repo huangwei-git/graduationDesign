@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 @MapperScan("com.songlian.logistics.dao")
@@ -105,13 +106,8 @@ class SpringbootApplicationTests {
 
     @Test
     public void testUpdateTime(){
-        String orderId = "%%";
-        String materialName = "%%";
-        String supplierName = "%%";
-        String demanderName = "%%";
-        orderDetailDao.orderDetailList(orderId,materialName,supplierName,demanderName,null,"0",0l,50l).forEach(item -> {
-            System.out.println("item = " + item);
-        });
+        List<Map> allMaterialCount = materialDao.getAllMaterialCount();
+        System.out.println("allMaterialCount = " + allMaterialCount);
     }
 
 }
